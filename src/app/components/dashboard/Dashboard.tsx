@@ -1,13 +1,12 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Steps, Button, message, theme, Card, Row, Col, Progress } from 'antd';
+import { Button, message, Card, Row, Col } from 'antd';
 import {
   CheckCircleOutlined,
   RightOutlined,
   LeftOutlined,
   UserOutlined,
   SolutionOutlined,
-  EnvironmentOutlined,
   AimOutlined,
   ToolOutlined,
   BarChartOutlined,
@@ -27,7 +26,6 @@ import ReferralIncentive from './steps/ReferralIncentive';
 import ComplianceLegal from './steps/ComplianceLegal';
 
 const Dashboard: React.FC = () => {
-  const { token } = theme.useToken();
   const [current, setCurrent] = useState(0);
   const [formData, setFormData] = useState<any>({});
 
@@ -83,9 +81,9 @@ const Dashboard: React.FC = () => {
     },
   ];
 
-  const progress = Math.round(((current + 1) / steps.length) * 100);
-
   function handleNext() {
+    const currentStepData = steps[current].content.props.initialValues;
+    setFormData({ ...formData, ...currentStepData });
     setCurrent(current + 1);
   }
 
@@ -94,19 +92,8 @@ const Dashboard: React.FC = () => {
   }
 
   function handleSubmit() {
-    console.log('Form submitted:', formData);
     message.success('Application submitted successfully!');
   }
-
-  const contentStyle: React.CSSProperties = {
-    minHeight: 200,
-    padding: 32,
-    marginTop: 24,
-    backgroundColor: token.colorBgContainer,
-    border: `1px solid ${token.colorBorderSecondary}`,
-    borderRadius: token.borderRadiusLG,
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-  };
 
   return (
     <div className="min-h-screen p-8">

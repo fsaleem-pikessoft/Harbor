@@ -1,10 +1,8 @@
 'use client';
 import React from 'react';
-import { Form, Input, Card, Typography, Select, Radio, Row, Col } from 'antd';
-import { DollarOutlined, RiseOutlined } from '@ant-design/icons';
+import { Form, Card, Typography, Radio, Row, Col } from 'antd';
 
 const { Title, Text } = Typography;
-const { Option } = Select;
 
 interface GoalsPreferencesProps {
   initialValues?: any;

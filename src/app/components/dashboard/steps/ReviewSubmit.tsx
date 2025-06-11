@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
-import { Form, Button, Card, Typography, Descriptions, Space } from 'antd';
-import { CheckCircleOutlined, EditOutlined } from '@ant-design/icons';
+import { Button, Card, Typography, Descriptions } from 'antd';
+import { CheckCircleOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 

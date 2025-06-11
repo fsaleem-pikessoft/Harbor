@@ -78,7 +78,7 @@ interface Props {
   initialValues: any;
 }
 
-const LeadListingManagement: React.FC<Props> = ({ initialValues }) => {
+const LeadListingManagement: React.FC<Props> = () => {
   const [listingMethod, setListingMethod] = useState<string>('');
   const [leadMethod, setLeadMethod] = useState<string>('');
 

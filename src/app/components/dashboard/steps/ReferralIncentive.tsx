@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { Form, Input, Card, Typography, Select, InputNumber, Switch, Row, Col } from 'antd';
-import { GiftOutlined, TeamOutlined, DollarOutlined, PercentageOutlined } from '@ant-design/icons';
+import { PercentageOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 const { Option } = Select;

@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 import { useMutation, QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
-import { Form, Input, Button, Card, Typography, Space, Alert, message } from 'antd';
+import { Form, Input, Button, Card, Typography, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 import { userLogin } from '@/api/authApi';
@@ -19,7 +18,6 @@ interface LoginFormValues {
 const queryClient = new QueryClient();
 
 function LoginForm() {
-  const router = useRouter();
   const { login } = useAuth();
   const [loading, setLoading] = useState<boolean>(false);
 

@@ -6,7 +6,6 @@ import { Form, Input, Button, Card, Typography, message } from 'antd';
 import { UserOutlined, MailOutlined, LockOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 import { signUp } from '@/api/authApi';
-import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 
 const { Title, Text } = Typography;
@@ -26,7 +25,7 @@ function SignupForm() {
 
   const { mutate: mutateSignup, isPending } = useMutation({
     mutationFn: (data: any) => signUp(data),
-    onSuccess: (res) => {
+    onSuccess: () => {
       message.success('Account Created Successfully');
       router.push('/auth/login');
     },

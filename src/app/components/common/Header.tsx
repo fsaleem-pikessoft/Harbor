@@ -43,7 +43,7 @@ function HeaderContent() {
     }
   };
 
-  const { mutate: mutateMe, isPending } = useMutation({
+  const { mutate: mutateMe } = useMutation({
     mutationFn: () => meAuth(),
     onSuccess: (res) => {
       setUserInfo(res?.data?.info);

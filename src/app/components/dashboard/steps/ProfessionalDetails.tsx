@@ -1,10 +1,8 @@
 'use client';
 import React from 'react';
-import { Form, Input, Button, Card, Typography, Select, Row, Col, Checkbox, Slider } from 'antd';
-import { CalendarOutlined, DollarOutlined, TeamOutlined } from '@ant-design/icons';
+import { Form, Input, Card, Typography, Row, Col, Checkbox, Slider } from 'antd';
 
 const { Title, Text } = Typography;
-const { Option } = Select;
 
 interface ProfessionalDetailsProps {
   initialValues?: any;

@@ -19,7 +19,7 @@ interface BasicInformationProps {
 const BasicInformation: React.FC<BasicInformationProps> = ({ initialValues }) => {
   const [form] = Form.useForm();
 
-  const handleSubmit = (values: any) => {
+  const handleSubmit = () => {
     // submission logic
   };
 

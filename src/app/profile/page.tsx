@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Card, Typography, Modal, Steps, Form, Upload, message, Avatar, Button, Image } from 'antd';
+import { Card, Typography, Modal, Steps, Form, Upload, message, Avatar, Button } from 'antd';
 import {
   UploadOutlined,
   EditOutlined,

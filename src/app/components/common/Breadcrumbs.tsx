@@ -20,9 +20,7 @@ const Breadcrumbs = () => {
       },
     ];
 
-    let currentPath = '';
     paths.forEach((path) => {
-      currentPath += `/${path}`;
       items.push({
         title: <>{path.charAt(0).toUpperCase() + path.slice(1)}</>,
       });

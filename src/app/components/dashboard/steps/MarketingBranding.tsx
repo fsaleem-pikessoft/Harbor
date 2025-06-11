@@ -1,10 +1,9 @@
 'use client';
 import React from 'react';
-import { Form, Input, Card, Typography, Select, Checkbox, Button, Row, Col } from 'antd';
-import { TrademarkCircleOutlined, UploadOutlined } from '@ant-design/icons';
+import { Form, Input, Card, Typography, Checkbox, Button, Row, Col } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
-const { Option } = Select;
 
 interface MarketingBrandingProps {
   initialValues?: any;

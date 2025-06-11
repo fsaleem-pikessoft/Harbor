@@ -1,16 +1,7 @@
 'use client';
 
 import { Layout, Menu } from 'antd';
-import {
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  LineChartOutlined,
-  GlobalOutlined,
-  BankOutlined,
-  RadarChartOutlined,
-  WalletOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
+import { MenuFoldOutlined, MenuUnfoldOutlined, UserOutlined } from '@ant-design/icons';
 import { BsPersonVcard } from 'react-icons/bs';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';

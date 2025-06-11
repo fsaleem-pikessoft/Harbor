@@ -9,7 +9,7 @@ interface Props {
   initialValues: any;
 }
 
-const ComplianceLegal: React.FC<Props> = ({ initialValues }) => {
+const ComplianceLegal: React.FC<Props> = () => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
 
