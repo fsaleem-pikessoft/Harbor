@@ -78,7 +78,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
                     padding: 24,
                     height: 'calc(100vh - 64px)',
                     overflowY: 'auto',
-                    background: 'linear-gradient(to top right, #f0f9ff, #eef2ff)',
+                    background: '#F2F5FA',
                   }}
                 >
                   <Breadcrumbs />

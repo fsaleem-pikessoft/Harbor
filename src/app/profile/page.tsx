@@ -1,22 +1,24 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Card, Typography, Modal, Steps, Form, Upload, message, Avatar, Button } from 'antd';
+import { Card, Typography, Modal, Steps, Form, message, Button, Row, Col, Avatar } from 'antd';
 import {
-  UploadOutlined,
   EditOutlined,
-  UserOutlined,
   FileTextOutlined,
-  ReadOutlined,
-  CameraOutlined,
+  VideoCameraOutlined,
+  ShareAltOutlined,
+  FacebookOutlined,
+  LinkedinOutlined,
+  InstagramOutlined,
+  YoutubeOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
-import dynamic from 'next/dynamic';
-import 'react-quill/dist/quill.snow.css';
+import BasicInfoStep from '../components/profile/BasicInfoStep';
+import SocialMediaStep from '../components/profile/SocialMediaStep';
+import VideoUploadStep from '../components/profile/VideoUploadStep';
 
 const { Title, Text } = Typography;
 const { Step } = Steps;
-
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
 const LOCAL_STORAGE_KEY = 'profileData';
 
@@ -24,125 +26,8 @@ const ProfilePage = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [form] = Form.useForm();
-  const [fileList, setFileList] = useState<any[]>([]);
+  const [videoList, setVideoList] = useState<any[]>([]);
   const [profileData, setProfileData] = useState<any>(null);
-  const [shortBio, setShortBio] = useState('');
-  const [longBio, setLongBio] = useState('');
-
-  useEffect(() => {
-    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      setProfileData(parsed);
-      setShortBio(parsed.shortBio || '');
-      setLongBio(parsed.longBio || '');
-
-      if (parsed.images?.length) {
-        setFileList(
-          parsed.images.map((url: string, idx: number) => ({
-            uid: `saved-${idx}`,
-            name: `Image-${idx + 1}`,
-            status: 'done',
-            url,
-          }))
-        );
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    if (modalOpen && profileData) {
-      form.setFieldsValue({
-        shortBio: profileData.shortBio || '',
-        longBio: profileData.longBio || '',
-      });
-      setShortBio(profileData.shortBio || '');
-      setLongBio(profileData.longBio || '');
-
-      if (profileData.images?.length) {
-        setFileList(
-          profileData.images.map((url: string, idx: number) => ({
-            uid: `saved-${idx}`,
-            name: `Image-${idx + 1}`,
-            status: 'done',
-            url,
-          }))
-        );
-      } else {
-        setFileList([]);
-      }
-    }
-    if (!modalOpen) {
-      setCurrentStep(0);
-    }
-  }, [modalOpen, profileData, form]);
-
-  const steps = [
-    {
-      title: 'Short Bio',
-      icon: <FileTextOutlined />,
-      content: (
-        <Form.Item
-          name="shortBio"
-          label="Short Bio"
-          rules={[{ required: true, message: 'Please enter a short bio' }]}
-        >
-          <ReactQuill
-            value={shortBio}
-            onChange={(val) => {
-              setShortBio(val);
-              form.setFieldValue('shortBio', val);
-            }}
-          />
-        </Form.Item>
-      ),
-    },
-    {
-      title: 'Long Bio',
-      icon: <ReadOutlined />,
-      content: (
-        <Form.Item
-          name="longBio"
-          label="Long Bio"
-          rules={[{ required: true, message: 'Please enter a long bio' }]}
-        >
-          <ReactQuill
-            value={longBio}
-            onChange={(val) => {
-              setLongBio(val);
-              form.setFieldValue('longBio', val);
-            }}
-          />
-        </Form.Item>
-      ),
-    },
-    {
-      title: 'Upload Photos',
-      icon: <CameraOutlined />,
-      content: (
-        <Form.Item label="Upload Photos">
-          <Upload
-            listType="picture-card"
-            fileList={fileList}
-            beforeUpload={() => false}
-            onChange={({ fileList }) => setFileList(fileList.slice(-1))}
-            maxCount={1}
-            accept="image/*"
-          >
-            {fileList.length >= 1 ? null : (
-              <div>
-                <UploadOutlined />
-                <div style={{ marginTop: 8 }}>Upload</div>
-              </div>
-            )}
-          </Upload>
-        </Form.Item>
-      ),
-    },
-  ];
-
-  const next = () => setCurrentStep((prev) => prev + 1);
-  const prev = () => setCurrentStep((prev) => prev - 1);
 
   const getBase64 = (file: Blob): Promise<string | ArrayBuffer | null> =>
     new Promise((resolve, reject) => {
@@ -152,136 +37,327 @@ const ProfilePage = () => {
       reader.onerror = (error) => reject(error);
     });
 
+  const handleInputChange = (field: string, value: string) => {
+    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+    let currentData = {};
+
+    if (saved) {
+      try {
+        currentData = JSON.parse(saved);
+      } catch (error) {
+        console.error('Error parsing saved data:', error);
+      }
+    }
+
+    const updatedData = {
+      ...currentData,
+      [field]: value,
+    };
+
+    console.log('Saving data:', updatedData); // Debug log
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedData));
+    setProfileData(updatedData); // Update state immediately
+  };
+
   const handleFinish = async () => {
     try {
       const values = await form.validateFields();
+      console.log('Form values:', values); // Debug log
 
-      const images: string[] = [];
-      for (const file of fileList) {
+      const videos: string[] = [];
+      for (const file of videoList) {
         if (file.url) {
-          images.push(file.url);
+          videos.push(file.url);
         } else if (file.originFileObj) {
           const base64 = await getBase64(file.originFileObj);
-          images.push(base64 as string);
+          videos.push(base64 as string);
         }
       }
 
       const dataToSave = {
-        ...values,
-        shortBio,
-        longBio,
-        images,
+        firstName: values.firstName || '',
+        lastName: values.lastName || '',
+        tagLine: values.tagLine || '',
+        about: values.about || '',
+        facebook: values.facebook || '',
+        linkedin: values.linkedin || '',
+        instagram: values.instagram || '',
+        youtube: values.youtube || '',
+        videos: videos,
       };
 
+      console.log('Data to save:', dataToSave); // Debug log
+
+      // Save to localStorage
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dataToSave));
+
+      // Update state
       setProfileData(dataToSave);
+
+      // Show success message
       message.success('Profile saved successfully!');
+
+      // Close modal and reset form
       setModalOpen(false);
-    } catch {
+      setCurrentStep(0);
+
+      // Force a re-render
+      setTimeout(() => {
+        const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          setProfileData(parsed);
+        }
+      }, 100);
+    } catch (error) {
+      console.error('Form submission error:', error);
       message.error('Please fill all required fields before saving');
     }
   };
 
+  // Add a new function to handle form submission
+  const handleFormSubmit = () => {
+    form.submit();
+  };
+
+  const next = () => setCurrentStep((prev) => prev + 1);
+  const prev = () => setCurrentStep((prev) => prev - 1);
+
+  const steps = [
+    {
+      title: 'Basic Info',
+      icon: <FileTextOutlined />,
+      content: <BasicInfoStep handleInputChange={handleInputChange} />,
+    },
+    {
+      title: 'Social Media',
+      icon: <ShareAltOutlined />,
+      content: <SocialMediaStep />,
+    },
+    {
+      title: 'Intro Video',
+      icon: <VideoCameraOutlined />,
+      content: <VideoUploadStep videoList={videoList} setVideoList={setVideoList} />,
+    },
+  ];
+
+  // Load initial data
+  useEffect(() => {
+    const loadInitialData = () => {
+      const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          console.log('Loading initial data:', parsed); // Debug log
+          setProfileData(parsed);
+          form.setFieldsValue({
+            firstName: parsed.firstName || '',
+            lastName: parsed.lastName || '',
+            tagLine: parsed.tagLine || '',
+            about: parsed.about || '',
+            facebook: parsed.facebook || '',
+            linkedin: parsed.linkedin || '',
+            instagram: parsed.instagram || '',
+            youtube: parsed.youtube || '',
+          });
+        } catch (error) {
+          console.error('Error loading initial data:', error);
+        }
+      }
+    };
+
+    loadInitialData();
+  }, [form]);
+
   return (
     <div className="min-h-screen p-8">
-      <Card className="max-w-4xl mx-auto rounded-3xl overflow-hidden">
-        <div className="relative  h-36 flex justify-center items-end pb-4">
-          {profileData?.images?.[0] ? (
+      <div className="p-8">
+        <Card className="flex justify-end mb-6" bodyStyle={{ padding: '14px' }}>
+          <Button
+            type="primary"
+            icon={<EditOutlined />}
+            onClick={() => {
+              setModalOpen(true);
+              // Load current data into form when opening modal
+              const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+              if (saved) {
+                try {
+                  const parsed = JSON.parse(saved);
+                  form.setFieldsValue({
+                    firstName: parsed.firstName || '',
+                    lastName: parsed.lastName || '',
+                    tagLine: parsed.tagLine || '',
+                    about: parsed.about || '',
+                    facebook: parsed.facebook || '',
+                    linkedin: parsed.linkedin || '',
+                    instagram: parsed.instagram || '',
+                    youtube: parsed.youtube || '',
+                  });
+                } catch (error) {
+                  console.error('Error loading form data:', error);
+                }
+              }
+            }}
+            className="rounded-lg shadow hover:shadow-md transition-all duration-300"
+            style={{
+              background: 'rgba(226, 213, 255, 0.3)',
+              border: 'none',
+              padding: '8px 20px',
+              height: 'auto',
+              fontWeight: 500,
+            }}
+          >
+            Edit Profile
+          </Button>
+        </Card>
+
+        {/* Profile Info Card */}
+        <Card
+          className="mb-6"
+          bordered={false}
+          style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
+          bodyStyle={{ padding: '14px' }}
+        >
+          <div className="flex flex-col items-center">
             <Avatar
-              size={120}
-              src={profileData.images[0]}
-              className="border-4 border-white shadow-2xl transform hover:scale-105 transition-transform duration-300"
-              style={{
-                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.2)',
-                cursor: 'pointer',
-              }}
-            />
-          ) : (
-            <Avatar
-              size={120}
+              size={80}
               icon={<UserOutlined />}
-              className="border-4 border-white shadow-2xl transform hover:scale-105 transition-transform duration-300"
-              style={{
-                backgroundColor: '#fff',
-                color: '#3A57E8',
-                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.2)',
-                cursor: 'pointer',
-              }}
+              className="mb-1"
+              style={{ backgroundColor: '#3A57E8' }}
             />
-          )}
-        </div>
-
-        <div className="p-8 bg-white">
-          <div className="flex justify-between items-center mb-8">
-            <Title level={2} className="text-gray-800">
-              Your Profile
+            <Title level={2} className="mb-1 !text-3xl text-center">
+              {profileData?.firstName && profileData?.lastName
+                ? `${profileData.firstName} ${profileData.lastName}`
+                : 'Your Name'}
             </Title>
-            <Button
-              type="primary"
-              icon={<EditOutlined />}
-              onClick={() => setModalOpen(true)}
-              className="rounded-lg shadow hover:shadow-md transition-all duration-300"
-              style={{
-                background: '#3A57E8',
-                border: 'none',
-                padding: '8px 20px',
-                height: 'auto',
-                fontWeight: 500,
-              }}
-            >
-              {profileData ? 'Edit Profile' : 'Create Profile'}
-            </Button>
-          </div>
-
-          {profileData ? (
-            <>
-              <div className="mb-8">
-                <Text strong className="block mb-2 text-lg text-gray-700">
-                  Short Bio
-                </Text>
-                <div
-                  className="prose max-w-none border p-4 rounded-lg bg-gradient-to-tr from-sky-50 to-indigo-50"
-                  dangerouslySetInnerHTML={{ __html: profileData.shortBio }}
-                />
-              </div>
-
-              <div className="mb-8">
-                <Text strong className="block mb-2 text-lg text-gray-700">
-                  Long Bio
-                </Text>
-                <div
-                  className="prose max-w-none border p-4 rounded-lg bg-gradient-to-tr from-sky-50 to-indigo-50"
-                  dangerouslySetInnerHTML={{ __html: profileData.longBio }}
-                />
-              </div>
-            </>
-          ) : (
-            <Text type="secondary">
-              No profile information available. Click create profile to add.
+            <Text className="text-gray-600 text-sm mt-[-16px]  text-center mb-2">
+              {profileData?.tagLine || 'Add your tag line'}
             </Text>
-          )}
-        </div>
-      </Card>
+          </div>
+        </Card>
+
+        {/* Two Column Layout */}
+        <Row gutter={24}>
+          {/* About Section */}
+          <Col xs={24} md={12}>
+            <Card
+              title="About"
+              className="h-full"
+              bordered={false}
+              style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
+            >
+              <Text className="text-gray-600 whitespace-pre-wrap">
+                {profileData?.about || 'Add a description about yourself'}
+              </Text>
+            </Card>
+          </Col>
+
+          {/* Media Gallery Section */}
+          <Col xs={24} md={12}>
+            <Card
+              title="Media Gallery"
+              className="h-full"
+              bordered={false}
+              style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
+            >
+              {profileData?.videos?.[0] ? (
+                <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                  <video
+                    src={profileData.videos[0]}
+                    controls
+                    className="absolute top-0 left-0 w-full h-full rounded-lg"
+                    style={{
+                      backgroundColor: '#000',
+                    }}
+                  />
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-48 bg-gray-50 rounded-lg">
+                  <Text className="text-gray-400">No video uploaded yet</Text>
+                </div>
+              )}
+            </Card>
+          </Col>
+        </Row>
+
+        {/* Social Media Links */}
+        {profileData && (
+          <div className="flex justify-center gap-4 mt-8">
+            {profileData.facebook && (
+              <a
+                href={profileData.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-800"
+              >
+                <FacebookOutlined style={{ fontSize: '24px' }} />
+              </a>
+            )}
+            {profileData.linkedin && (
+              <a
+                href={profileData.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-700 hover:text-blue-900"
+              >
+                <LinkedinOutlined style={{ fontSize: '24px' }} />
+              </a>
+            )}
+            {profileData.instagram && (
+              <a
+                href={profileData.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-pink-600 hover:text-pink-800"
+              >
+                <InstagramOutlined style={{ fontSize: '24px' }} />
+              </a>
+            )}
+            {profileData.youtube && (
+              <a
+                href={profileData.youtube}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-red-600 hover:text-red-800"
+              >
+                <YoutubeOutlined style={{ fontSize: '24px' }} />
+              </a>
+            )}
+          </div>
+        )}
+      </div>
 
       <Modal
-        title={profileData ? 'Edit Profile' : 'Create Profile'}
+        title="Edit Profile"
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
         footer={null}
-        width={720}
-        destroyOnClose
-        className="rounded-xl"
+        width={800}
       >
-        <Steps current={currentStep} className="mb-6">
-          {steps.map((s) => (
-            <Step key={s.title} title={s.title} icon={s.icon} />
-          ))}
-        </Steps>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleFinish}
+          initialValues={{
+            firstName: profileData?.firstName || '',
+            lastName: profileData?.lastName || '',
+            tagLine: profileData?.tagLine || '',
+            about: profileData?.about || '',
+            facebook: profileData?.facebook || '',
+            linkedin: profileData?.linkedin || '',
+            instagram: profileData?.instagram || '',
+            youtube: profileData?.youtube || '',
+          }}
+        >
+          <Steps current={currentStep} className="mb-8">
+            {steps.map((item) => (
+              <Step key={item.title} title={item.title} icon={item.icon} />
+            ))}
+          </Steps>
 
-        <Form form={form} layout="vertical" autoComplete="off">
-          {steps[currentStep].content}
+          <div className="min-h-[300px]">{steps[currentStep].content}</div>
 
-          <div className="flex justify-between mt-6">
+          <div className="flex justify-between mt-8">
             {currentStep > 0 && (
               <Button
                 onClick={prev}
@@ -293,7 +369,7 @@ const ProfilePage = () => {
                   fontWeight: 500,
                 }}
               >
-                Previous
+                Back
               </Button>
             )}
             <div className="ml-auto">
@@ -303,7 +379,7 @@ const ProfilePage = () => {
                   onClick={next}
                   className="rounded-lg shadow hover:shadow-md transition-all duration-300"
                   style={{
-                    background: '#3A57E8',
+                    background: 'rgba(226, 213, 255, 0.3)',
                     border: 'none',
                     padding: '8px 20px',
                     height: 'auto',
@@ -316,10 +392,10 @@ const ProfilePage = () => {
               {currentStep === steps.length - 1 && (
                 <Button
                   type="primary"
-                  onClick={handleFinish}
+                  onClick={handleFormSubmit}
                   className="rounded-lg shadow hover:shadow-md transition-all duration-300"
                   style={{
-                    background: '#3A57E8',
+                    background: '#e2d5ff',
                     border: 'none',
                     padding: '8px 20px',
                     height: 'auto',

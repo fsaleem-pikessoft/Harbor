@@ -64,6 +64,36 @@ a {
   font-family: var(--font-manrope) !important;
 }
 
+/* Remove specific Ant Design button style */
+:where(.css-dev-only-do-not-override-fs2n24).ant-btn.ant-btn-lg {
+  height: auto !important;
+  min-height: auto !important;
+  padding: 8px 16px !important;
+}
+
+.ant-btn-primary {
+  @apply bg-button !important;
+  border-color: theme('colors.button.DEFAULT') !important;
+}
+
+.ant-btn-primary:hover,
+.ant-btn-primary:focus {
+  @apply bg-button/80 !important;
+  border-color: theme('colors.button.DEFAULT') !important;
+}
+
+/* Selected Sidebar Item Styles */
+.ant-menu-item-selected {
+  background-color: #3788e5 !important;
+}
+
+.ant-menu-item-selected .anticon,
+.ant-menu-item-selected span,
+.ant-menu-item-selected svg {
+  color: white !important;
+  fill: white !important;
+}
+
 /* Ensure all text elements use Manrope */
 h1,
 h2,

@@ -1,8 +1,18 @@
 'use client';
 
 import { Layout, Menu } from 'antd';
-import { MenuFoldOutlined, MenuUnfoldOutlined, UserOutlined } from '@ant-design/icons';
-import { BsPersonVcard } from 'react-icons/bs';
+import {
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  UserOutlined,
+  DashboardOutlined,
+  BookOutlined,
+  ShoppingOutlined,
+  TeamOutlined,
+  HistoryOutlined,
+  MessageOutlined,
+  SettingOutlined,
+} from '@ant-design/icons';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -23,8 +33,14 @@ const Sidebar = ({ collapsed, onCollapse }: SidebarProps) => {
   }, [pathname]);
 
   const items = [
-    { key: '/dashboard', icon: <BsPersonVcard />, label: 'Dashboard' },
+    { key: '/dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
     { key: '/profile', icon: <UserOutlined />, label: 'Profile' },
+    { key: '/library', icon: <BookOutlined />, label: 'Library' },
+    { key: '', icon: <ShoppingOutlined />, label: 'Store' },
+    { key: '', icon: <TeamOutlined />, label: 'Collaborators' },
+    { key: '', icon: <HistoryOutlined />, label: 'Activity Log' },
+    { key: '', icon: <MessageOutlined />, label: 'AMA' },
+    { key: '', icon: <SettingOutlined />, label: 'Settings' },
   ];
 
   return (
@@ -57,7 +73,7 @@ const Sidebar = ({ collapsed, onCollapse }: SidebarProps) => {
         }}
       >
         {!collapsed && (
-          <div style={{ fontSize: '20px', fontWeight: 600, textAlign: 'center' }}>Harbor</div>
+          <div style={{ fontSize: '20px', fontWeight: 400, textAlign: 'center' }}>Harbor</div>
         )}
         <div
           onClick={() => onCollapse(!collapsed)}
