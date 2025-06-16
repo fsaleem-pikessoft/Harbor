@@ -44,7 +44,7 @@ module.exports = {
           light: '#9CA3AF', // Light gray for subtle text
         },
         button: {
-          DEFAULT: '#3788E5', // Light purple button color with 30% opacity
+          DEFAULT: '#1814F3', // Light purple button color with 30% opacity
         },
       },
       fontSize: {

@@ -34,15 +34,14 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     );
   }
 
-  const layoutContent = isAuthenticated && pathname !== '/login';
-
+  const layoutContent = isAuthenticated && !pathname.startsWith('/auth/');
   return (
     <Provider store={store}>
       <ConfigProvider
         theme={{
           algorithm: theme.defaultAlgorithm,
           token: {
-            colorBgLayout: '#F5F7F9',
+            colorBgLayout: '#F5F7FA',
             borderRadius: 12,
             colorPrimary: '#3A57E8',
           },
@@ -78,7 +77,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
                     padding: 24,
                     height: 'calc(100vh - 64px)',
                     overflowY: 'auto',
-                    background: '#F2F5FA',
+                    background: '#F5F7FA',
                   }}
                 >
                   <Breadcrumbs />

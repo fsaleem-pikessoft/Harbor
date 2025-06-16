@@ -49,7 +49,7 @@ function SignupForm() {
           {/* Title Section */}
           <div className="w-full ml-[190px]" style={{ marginTop: '-100px', marginBottom: '40px' }}>
             <Title level={4} className="text-secondary-dark font-bold mb-1">
-              A&A Harbor
+              I M APP
             </Title>
             <Text className="text-black text-[11px] font-semibold block">
               Transforms identity into a living platform
@@ -129,7 +129,8 @@ function SignupForm() {
                   size="large"
                   block
                   loading={loading || isPending}
-                  className="h-12 rounded-lg bg-primary hover:bg-primary-dark text-white"
+                  className="rounded-lg bg-primary hover:bg-primary-dark text-white"
+                  style={{ borderRadius: '5px', fontSize: '10px', height: '30px' }}
                 >
                   Sign Up
                 </Button>

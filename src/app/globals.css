@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
 @import 'antd/dist/reset.css';
 
 @tailwind base;
@@ -8,7 +8,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --font-manrope: 'Manrope', sans-serif;
+  --font-inter: 'Inter', sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,7 +22,7 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
-  font-family: var(--font-manrope);
+  font-family: var(--font-inter);
 }
 
 body {
@@ -36,13 +36,13 @@ body {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
-  font-family: var(--font-manrope);
+  font-family: var(--font-inter);
 }
 
 a {
   color: inherit;
   text-decoration: none;
-  font-family: var(--font-manrope);
+  font-family: var(--font-inter);
 }
 
 /* Ant Design Component Styles */
@@ -61,7 +61,7 @@ a {
 .ant-tooltip,
 .ant-form,
 .ant-typography {
-  font-family: var(--font-manrope) !important;
+  font-family: var(--font-inter) !important;
 }
 
 /* Remove specific Ant Design button style */
@@ -84,17 +84,25 @@ a {
 
 /* Selected Sidebar Item Styles */
 .ant-menu-item-selected {
-  background-color: #3788e5 !important;
+  background-color: white !important;
 }
 
 .ant-menu-item-selected .anticon,
 .ant-menu-item-selected span,
 .ant-menu-item-selected svg {
-  color: white !important;
-  fill: white !important;
+  color: #1814f3 !important;
+  fill: #1814f3 !important;
 }
 
-/* Ensure all text elements use Manrope */
+/* Non-selected Sidebar Item Styles */
+.ant-menu-item:not(.ant-menu-item-selected) .anticon,
+.ant-menu-item:not(.ant-menu-item-selected) span,
+.ant-menu-item:not(.ant-menu-item-selected) svg {
+  color: #b1b1b1 !important;
+  fill: #b1b1b1 !important;
+}
+
+/* Ensure all text elements use Inter */
 h1,
 h2,
 h3,
@@ -109,7 +117,7 @@ button,
 input,
 select,
 textarea {
-  font-family: var(--font-manrope);
+  font-family: var(--font-inter);
 }
 
 @media (prefers-color-scheme: dark) {

@@ -16,6 +16,7 @@ import {
 import BasicInfoStep from '../components/profile/BasicInfoStep';
 import SocialMediaStep from '../components/profile/SocialMediaStep';
 import VideoUploadStep from '../components/profile/VideoUploadStep';
+import { useRouter } from 'next/navigation';
 
 const { Title, Text } = Typography;
 const { Step } = Steps;
@@ -23,6 +24,7 @@ const { Step } = Steps;
 const LOCAL_STORAGE_KEY = 'profileData';
 
 const ProfilePage = () => {
+  const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [form] = Form.useForm();
@@ -170,45 +172,54 @@ const ProfilePage = () => {
   }, [form]);
 
   return (
-    <div className="min-h-screen p-8">
+    <div className="min-h-screen p-2">
       <div className="p-8">
         <Card className="flex justify-end mb-6" bodyStyle={{ padding: '14px' }}>
-          <Button
-            type="primary"
-            icon={<EditOutlined />}
-            onClick={() => {
-              setModalOpen(true);
-              // Load current data into form when opening modal
-              const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-              if (saved) {
-                try {
-                  const parsed = JSON.parse(saved);
-                  form.setFieldsValue({
-                    firstName: parsed.firstName || '',
-                    lastName: parsed.lastName || '',
-                    tagLine: parsed.tagLine || '',
-                    about: parsed.about || '',
-                    facebook: parsed.facebook || '',
-                    linkedin: parsed.linkedin || '',
-                    instagram: parsed.instagram || '',
-                    youtube: parsed.youtube || '',
-                  });
-                } catch (error) {
-                  console.error('Error loading form data:', error);
-                }
-              }
-            }}
-            className="rounded-lg shadow hover:shadow-md transition-all duration-300"
-            style={{
-              background: 'rgba(226, 213, 255, 0.3)',
-              border: 'none',
-              padding: '8px 20px',
-              height: 'auto',
-              fontWeight: 500,
-            }}
-          >
-            Edit Profile
-          </Button>
+          <Row gutter={16}>
+            <Col>
+              <Button
+                type="primary"
+                size="large"
+                onClick={() => router.push('/auth/public-profile')}
+                style={{ borderRadius: '5px', fontSize: '10px', height: '30px' }}
+                className="bg-button hover:bg-button/80  rounded-none px-6 flex items-center shadow-sm hover:shadow-md transition-all duration-300"
+              >
+                View Profile
+              </Button>
+            </Col>
+            <Col>
+              <Button
+                type="primary"
+                size="large"
+                onClick={() => {
+                  setModalOpen(true);
+                  // Load current data into form when opening modal
+                  const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+                  if (saved) {
+                    try {
+                      const parsed = JSON.parse(saved);
+                      form.setFieldsValue({
+                        firstName: parsed.firstName || '',
+                        lastName: parsed.lastName || '',
+                        tagLine: parsed.tagLine || '',
+                        about: parsed.about || '',
+                        facebook: parsed.facebook || '',
+                        linkedin: parsed.linkedin || '',
+                        instagram: parsed.instagram || '',
+                        youtube: parsed.youtube || '',
+                      });
+                    } catch (error) {
+                      console.error('Error loading form data:', error);
+                    }
+                  }
+                }}
+                style={{ borderRadius: '5px', fontSize: '10px', height: '30px' }}
+                className="bg-button hover:bg-button/80  rounded-none px-6 flex items-center shadow-sm hover:shadow-md transition-all duration-300"
+              >
+                Edit Profile
+              </Button>
+            </Col>
+          </Row>
         </Card>
 
         {/* Profile Info Card */}
@@ -362,12 +373,7 @@ const ProfilePage = () => {
               <Button
                 onClick={prev}
                 className="rounded-lg shadow hover:shadow-md transition-all duration-300"
-                style={{
-                  border: '1px solid #E5E7EB',
-                  padding: '8px 20px',
-                  height: 'auto',
-                  fontWeight: 500,
-                }}
+                style={{ borderRadius: '5px', fontSize: '10px', height: '30px' }}
               >
                 Back
               </Button>
@@ -378,13 +384,7 @@ const ProfilePage = () => {
                   type="primary"
                   onClick={next}
                   className="rounded-lg shadow hover:shadow-md transition-all duration-300"
-                  style={{
-                    background: 'rgba(226, 213, 255, 0.3)',
-                    border: 'none',
-                    padding: '8px 20px',
-                    height: 'auto',
-                    fontWeight: 500,
-                  }}
+                  style={{ borderRadius: '5px', fontSize: '10px', height: '30px' }}
                 >
                   Next
                 </Button>
@@ -394,13 +394,7 @@ const ProfilePage = () => {
                   type="primary"
                   onClick={handleFormSubmit}
                   className="rounded-lg shadow hover:shadow-md transition-all duration-300"
-                  style={{
-                    background: '#e2d5ff',
-                    border: 'none',
-                    padding: '8px 20px',
-                    height: 'auto',
-                    fontWeight: 500,
-                  }}
+                  style={{ borderRadius: '5px', fontSize: '10px', height: '30px' }}
                 >
                   Save Profile
                 </Button>

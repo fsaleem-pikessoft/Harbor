@@ -29,7 +29,7 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen p-8">
+    <div className="min-h-screen p-2">
       <Modal
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
@@ -74,12 +74,12 @@ const Dashboard = () => {
                   <Button
                     type="primary"
                     size="large"
-                    className="bg-button hover:bg-button/80 text-xs px-6 flex items-center shadow-sm hover:shadow-md transition-all duration-300"
+                    className="bg-button hover:bg-button/80  px-4 flex items-center shadow-sm hover:shadow-md transition-all duration-300"
                     onClick={() => {
                       setModalOpen(false);
                       handleClick();
                     }}
-                    style={{ borderRadius: '10px' }}
+                    style={{ borderRadius: '5px', fontSize: '10px', height: '30px' }}
                   >
                     Setup Your Profile
                   </Button>
@@ -98,8 +98,7 @@ const Dashboard = () => {
                 <Button
                   type="primary"
                   size="large"
-                  icon={<RocketOutlined />}
-                  style={{ borderRadius: '10px' }}
+                  style={{ borderRadius: '5px', fontSize: '10px', height: '30px' }}
                   className="bg-button hover:bg-button/80 text-xs rounded-none px-6 flex items-center shadow-sm hover:shadow-md transition-all duration-300"
                 >
                   My Launchpad
@@ -109,8 +108,7 @@ const Dashboard = () => {
                 <Button
                   type="primary"
                   size="large"
-                  icon={<CalendarOutlined />}
-                  style={{ borderRadius: '10px' }}
+                  style={{ borderRadius: '5px', fontSize: '10px', height: '30px' }}
                   className="bg-button hover:bg-button/80 text-xs rounded-none px-6 flex items-center shadow-sm hover:shadow-md transition-all duration-300"
                 >
                   Schedule
@@ -120,8 +118,7 @@ const Dashboard = () => {
                 <Button
                   type="primary"
                   size="large"
-                  icon={<GlobalOutlined />}
-                  style={{ borderRadius: '10px' }}
+                  style={{ borderRadius: '5px', fontSize: '10px', height: '30px' }}
                   className="bg-button hover:bg-button/80 text-xs rounded-none px-6 flex items-center shadow-sm hover:shadow-md transition-all duration-300"
                 >
                   Ecosystem News
@@ -131,8 +128,7 @@ const Dashboard = () => {
                 <Button
                   type="primary"
                   size="large"
-                  icon={<ShopOutlined />}
-                  style={{ borderRadius: '10px' }}
+                  style={{ borderRadius: '5px', fontSize: '10px', height: '30px' }}
                   className="bg-button hover:bg-button/80 text-xs rounded-none px-6 flex items-center shadow-sm hover:shadow-md transition-all duration-300"
                 >
                   Marketplace
@@ -155,7 +151,7 @@ const Dashboard = () => {
                     <Button
                       type="primary"
                       size="large"
-                      style={{ borderRadius: '10px' }}
+                      style={{ borderRadius: '5px', fontSize: '10px', height: '30px' }}
                       className="bg-button hover:bg-button/80 text-xs rounded-none px-6 flex items-center shadow-sm hover:shadow-md transition-all duration-300"
                     >
                       View Calendar

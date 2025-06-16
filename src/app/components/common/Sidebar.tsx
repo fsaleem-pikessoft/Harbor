@@ -4,15 +4,15 @@ import { Layout, Menu } from 'antd';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  UserOutlined,
-  DashboardOutlined,
-  BookOutlined,
-  ShoppingOutlined,
-  TeamOutlined,
-  HistoryOutlined,
-  MessageOutlined,
-  SettingOutlined,
+  DashboardFilled,
+  BookFilled,
+  ShoppingFilled,
+  TrademarkCircleFilled,
+  MessageFilled,
+  SettingFilled,
 } from '@ant-design/icons';
+import { FaUser } from 'react-icons/fa';
+import { FaClockRotateLeft } from 'react-icons/fa6';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -33,14 +33,14 @@ const Sidebar = ({ collapsed, onCollapse }: SidebarProps) => {
   }, [pathname]);
 
   const items = [
-    { key: '/dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
-    { key: '/profile', icon: <UserOutlined />, label: 'Profile' },
-    { key: '/library', icon: <BookOutlined />, label: 'Library' },
-    { key: '', icon: <ShoppingOutlined />, label: 'Store' },
-    { key: '', icon: <TeamOutlined />, label: 'Collaborators' },
-    { key: '', icon: <HistoryOutlined />, label: 'Activity Log' },
-    { key: '', icon: <MessageOutlined />, label: 'AMA' },
-    { key: '', icon: <SettingOutlined />, label: 'Settings' },
+    { key: '/dashboard', icon: <DashboardFilled />, label: 'Dashboard' },
+    { key: '/profile', icon: <FaUser />, label: 'Profile' },
+    { key: '/library', icon: <BookFilled />, label: 'Library' },
+    { key: '/store', icon: <ShoppingFilled />, label: 'Store' },
+    { key: '/collaborators', icon: <TrademarkCircleFilled />, label: 'Collaborators' },
+    { key: '/activityLog', icon: <FaClockRotateLeft />, label: 'Activity Log' },
+    { key: '/ama', icon: <MessageFilled />, label: 'AMA' },
+    { key: '/settings', icon: <SettingFilled />, label: 'Settings' },
   ];
 
   return (
@@ -60,7 +60,6 @@ const Sidebar = ({ collapsed, onCollapse }: SidebarProps) => {
         background: '#FFFFFF',
         paddingTop: 16,
         borderRight: '1px solid rgba(0, 0, 0, 0.06)',
-        fontFamily: 'Manrope',
       }}
     >
       <div
@@ -73,7 +72,7 @@ const Sidebar = ({ collapsed, onCollapse }: SidebarProps) => {
         }}
       >
         {!collapsed && (
-          <div style={{ fontSize: '20px', fontWeight: 400, textAlign: 'center' }}>Harbor</div>
+          <div style={{ fontSize: '20px', fontWeight: 600, textAlign: 'center' }}>I M APP</div>
         )}
         <div
           onClick={() => onCollapse(!collapsed)}
@@ -96,7 +95,7 @@ const Sidebar = ({ collapsed, onCollapse }: SidebarProps) => {
         items={items}
         style={{
           fontFamily: 'Manrope',
-          fontWeight: 'bold',
+          fontWeight: '400',
           fontSize: '12px',
         }}
       />

@@ -87,15 +87,9 @@ function HeaderContent() {
       />
 
       <Space size="large">
-        <Button
-          type="text"
-          icon={<BellOutlined style={{ fontSize: 20 }} />}
-          style={{ display: 'flex', alignItems: 'center' }}
-        />
-
         <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" arrow>
           <Space style={{ cursor: 'pointer', fontFamily: 'Manrope' }}>
-            <Avatar icon={<UserOutlined />} />
+            <Avatar src="/images/avatar.svg" alt="image" />
             <span>
               {userInfo?.firstName} {userInfo?.lastName}
             </span>
