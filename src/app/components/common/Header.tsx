@@ -1,8 +1,8 @@
 'use client';
 
 import { useMutation, QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Layout, Button, Space, Avatar, Dropdown, Input, MenuProps, message } from 'antd';
-import { BellOutlined, UserOutlined, SearchOutlined, LogoutOutlined } from '@ant-design/icons';
+import { Layout, Space, Avatar, Dropdown, Input, MenuProps, message } from 'antd';
+import { SearchOutlined, LogoutOutlined } from '@ant-design/icons';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { meAuth } from '@/api/authApi';

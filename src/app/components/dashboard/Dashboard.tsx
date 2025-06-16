@@ -3,7 +3,6 @@
 import { Card, Typography, Button, Row, Col, Modal } from 'antd';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { RocketOutlined, CalendarOutlined, GlobalOutlined, ShopOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 

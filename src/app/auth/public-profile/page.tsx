@@ -4,8 +4,6 @@ import { Avatar, Button, Carousel, Card } from 'antd';
 import { YoutubeOutlined, FacebookOutlined, LinkedinOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 
-const { Meta } = Card;
-
 export default function PublicProfilePage() {
   return (
     <motion.div

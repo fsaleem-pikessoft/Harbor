@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Typography, Modal, Steps, Form, message, Button, Row, Col, Avatar } from 'antd';
 import {
-  EditOutlined,
   FileTextOutlined,
   VideoCameraOutlined,
   ShareAltOutlined,
