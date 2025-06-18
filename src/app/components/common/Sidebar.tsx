@@ -4,15 +4,15 @@ import { Layout, Menu } from 'antd';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  DashboardFilled,
-  BookFilled,
-  ShoppingFilled,
-  TrademarkCircleFilled,
-  MessageFilled,
-  SettingFilled,
+  DashboardOutlined,
+  BookOutlined,
+  ShoppingOutlined,
+  TrademarkCircleOutlined,
+  MessageOutlined,
+  SettingOutlined,
+  UserOutlined,
+  ClockCircleOutlined,
 } from '@ant-design/icons';
-import { FaUser } from 'react-icons/fa';
-import { FaClockRotateLeft } from 'react-icons/fa6';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -33,14 +33,14 @@ const Sidebar = ({ collapsed, onCollapse }: SidebarProps) => {
   }, [pathname]);
 
   const items = [
-    { key: '/dashboard', icon: <DashboardFilled />, label: 'Dashboard' },
-    { key: '/profile', icon: <FaUser />, label: 'Profile' },
-    { key: '/library', icon: <BookFilled />, label: 'Library' },
-    { key: '/store', icon: <ShoppingFilled />, label: 'Store' },
-    { key: '/collaborators', icon: <TrademarkCircleFilled />, label: 'Collaborators' },
-    { key: '/activityLog', icon: <FaClockRotateLeft />, label: 'Activity Log' },
-    { key: '/ama', icon: <MessageFilled />, label: 'AMA' },
-    { key: '/settings', icon: <SettingFilled />, label: 'Settings' },
+    { key: '/dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
+    { key: '/profile', icon: <UserOutlined />, label: 'Profile' },
+    { key: '/library', icon: <BookOutlined />, label: 'Library' },
+    { key: '/store', icon: <ShoppingOutlined />, label: 'Store' },
+    { key: '/collaborators', icon: <TrademarkCircleOutlined />, label: 'Collaborators' },
+    { key: '/activityLog', icon: <ClockCircleOutlined />, label: 'Activity Log' },
+    { key: '/ama', icon: <MessageOutlined />, label: 'AMA' },
+    { key: '/settings', icon: <SettingOutlined />, label: 'Settings' },
   ];
 
   return (

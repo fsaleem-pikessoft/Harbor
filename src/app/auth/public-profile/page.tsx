@@ -4,7 +4,7 @@ import { Avatar, Button, Carousel, Card } from 'antd';
 import { YoutubeOutlined, FacebookOutlined, LinkedinOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 
-export default function PublicProfilePage() {
+const PublicProfilePage = () => {
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -259,4 +259,6 @@ export default function PublicProfilePage() {
       </motion.section>
     </motion.div>
   );
-}
+};
+
+export default PublicProfilePage;

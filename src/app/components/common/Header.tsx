@@ -2,7 +2,7 @@
 
 import { useMutation, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Layout, Space, Avatar, Dropdown, Input, MenuProps, message } from 'antd';
-import { SearchOutlined, LogoutOutlined } from '@ant-design/icons';
+import { SearchOutlined, LogoutOutlined, DownOutlined } from '@ant-design/icons';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { meAuth } from '@/api/authApi';
@@ -15,6 +15,12 @@ const queryClient = new QueryClient();
 interface UserInfo {
   firstName: string;
   lastName: string;
+}
+
+interface ApiError {
+  response?: {
+    data: string;
+  };
 }
 
 function HeaderContent() {
@@ -48,14 +54,14 @@ function HeaderContent() {
     onSuccess: (res) => {
       setUserInfo(res?.data?.info);
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       message.error(error?.response?.data);
     },
   });
 
   useEffect(() => {
     mutateMe();
-  }, []);
+  }, [mutateMe]);
 
   return (
     <AntHeader
@@ -74,25 +80,37 @@ function HeaderContent() {
     >
       <Input
         type="search"
-        placeholder="Enter ticker symbol..."
         allowClear
         size="large"
         onKeyDown={onSearch}
         style={{
           width: 300,
-          borderRadius: 8,
+          borderRadius: 10,
           fontFamily: 'Manrope',
+          backgroundColor: 'rgb(243 244 246)',
+          border: 'none',
         }}
-        prefix={<SearchOutlined style={{ color: 'rgba(0,0,0,.45)' }} />}
+        prefix={
+          <SearchOutlined
+            style={{ color: 'rgba(0,0,0,.45)', backgroundColor: 'rgb(243 244 246)' }}
+          />
+        }
+        className="custom-search-input"
       />
 
       <Space size="large">
-        <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" arrow>
+        <Dropdown
+          menu={{ items: userMenuItems }}
+          placement="bottomRight"
+          arrow
+          trigger={['hover', 'click']}
+        >
           <Space style={{ cursor: 'pointer', fontFamily: 'Manrope' }}>
-            <Avatar src="/images/avatar.svg" alt="image" />
-            <span>
+            <Avatar src="/images/avatar.svg" />
+            <span style={{ marginRight: 4 }}>
               {userInfo?.firstName} {userInfo?.lastName}
             </span>
+            <DownOutlined style={{ fontSize: '12px', color: '#8c8c8c' }} />
           </Space>
         </Dropdown>
       </Space>

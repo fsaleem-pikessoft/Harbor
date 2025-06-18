@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -33,6 +34,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = () => {
     Cookies.remove('token');
     setIsAuthenticated(false);
+    toast.success('Logout Successfully');
     router.push('/auth/login');
   };
 

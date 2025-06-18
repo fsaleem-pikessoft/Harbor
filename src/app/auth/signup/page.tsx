@@ -18,6 +18,12 @@ interface SignupFormValues {
   password: string;
 }
 
+interface ApiError {
+  response?: {
+    data: string;
+  };
+}
+
 const queryClient = new QueryClient();
 
 function SignupForm() {
@@ -25,12 +31,12 @@ function SignupForm() {
   const [loading, setLoading] = useState<boolean>(false);
 
   const { mutate: mutateSignup, isPending } = useMutation({
-    mutationFn: (data: any) => signUp(data),
+    mutationFn: (data: SignupFormValues) => signUp(data),
     onSuccess: () => {
       message.success('Account Created Successfully');
       router.push('/auth/login');
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       message.error(error?.response?.data);
       setLoading(false);
     },
@@ -42,83 +48,95 @@ function SignupForm() {
   };
 
   return (
-    <div className="w-full h-screen overflow-hidden">
-      <Row style={{ height: '100vh', margin: 0, padding: 0 }} className="w-full m-0 p-0">
+    <div className="w-full min-h-screen">
+      <Row style={{ minHeight: '100vh', margin: 0, padding: 0 }} className="w-full m-0 p-0">
         {/* Left Side - Title and Form */}
-        <Col xs={24} md={10} className="flex flex-col justify-center items-center ">
+        <Col xs={24} md={11} className="flex flex-col justify-center items-center py-8">
           {/* Title Section */}
-          <div className="w-full ml-[190px]" style={{ marginTop: '-100px', marginBottom: '40px' }}>
-            <Title level={4} className="text-secondary-dark font-bold mb-1">
+          <div className="w-full pl-[50px] mb-8">
+            <Title
+              level={4}
+              className="text-secondary-dark font-bold mb-1"
+              style={{ fontSize: '20px', fontWeight: '500' }}
+            >
               I M APP
             </Title>
-            <Text className="text-black text-[11px] font-semibold block">
+            <Text className="text-[rgb(75 85 99)] text-[11px] block">
               Transforms identity into a living platform
             </Text>
-            <Text className="text-black text-[11px] font-semibold block mt-[-4px]">
+            <Text className="text-[rgb(75 85 99)] text-[11px] block">
               It makes your story, commerce, and collaborations verifiable and valuable
             </Text>
           </div>
 
           {/* Signup Card */}
-          <Card className="w-full max-w-[350px]">
-            <Title level={2} className="text-center mb-6 text-secondary-dark">
+          <Card className="w-full max-w-[500px]">
+            <Title
+              level={2}
+              className="text-center mb-6 text-secondary-dark"
+              style={{ fontSize: '20px', fontWeight: '500' }}
+            >
               Sign Up
             </Title>
             <Form name="signup" onFinish={handleSignup} layout="vertical" requiredMark={false}>
               <Form.Item
                 name="firstName"
-                rules={[{ required: true, message: 'Please input your name!' }]}
-                style={{ marginBottom: '6px' }}
+                label="First Name"
+                rules={[{ required: true, message: 'Please input your first name!' }]}
+                style={{ marginBottom: '10px' }}
               >
                 <Input
-                  prefix={<UserOutlined className="text-secondary" />}
-                  placeholder="First Name"
+                  suffix={<UserOutlined className="text-secondary" style={{ fontWeight: '100' }} />}
+                  placeholder="Enter your first name"
                   size="large"
-                  className="rounded-lg"
+                  className="rounded-lg pt-2 pb-2"
                 />
               </Form.Item>
 
               <Form.Item
                 name="lastName"
-                rules={[{ required: true, message: 'Please input your name!' }]}
-                style={{ marginBottom: '6px' }}
+                label="Last Name"
+                rules={[{ required: true, message: 'Please input your last name!' }]}
+                style={{ marginBottom: '10px' }}
               >
                 <Input
-                  prefix={<UserOutlined className="text-secondary" />}
-                  placeholder="Last Name"
+                  suffix={<UserOutlined className="text-secondary" style={{ fontWeight: '100' }} />}
+                  placeholder="Enter your last name"
                   size="large"
-                  className="rounded-lg"
+                  className="rounded-lg pt-2 pb-2"
                 />
               </Form.Item>
 
               <Form.Item
                 name="email"
+                label="Email"
                 rules={[
                   { required: true, message: 'Please input your email!' },
                   { type: 'email', message: 'Please enter a valid email!' },
                 ]}
-                style={{ marginBottom: '6px' }}
+                style={{ marginBottom: '10px' }}
               >
                 <Input
-                  prefix={<MailOutlined className="text-secondary" />}
-                  placeholder="Email"
+                  suffix={<MailOutlined className="text-secondary" style={{ fontWeight: '100' }} />}
+                  placeholder="Enter your email"
                   size="large"
-                  className="rounded-lg"
+                  className="rounded-lg pt-2 pb-2"
                 />
               </Form.Item>
 
               <Form.Item
                 name="password"
+                label="Password"
                 rules={[
                   { required: true, message: 'Please input your password!' },
                   { min: 6, message: 'Password must be at least 6 characters!' },
                 ]}
               >
                 <Input.Password
-                  prefix={<LockOutlined className="text-secondary" />}
-                  placeholder="Password"
+                  suffix={<LockOutlined className="text-secondary" />}
+                  placeholder="Enter your password"
                   size="large"
-                  className="rounded-lg"
+                  className="rounded-lg pt-2 pb-2"
                 />
               </Form.Item>
 
@@ -130,14 +148,19 @@ function SignupForm() {
                   block
                   loading={loading || isPending}
                   className="rounded-lg bg-primary hover:bg-primary-dark text-white"
-                  style={{ borderRadius: '5px', fontSize: '10px', height: '30px' }}
+                  style={{ borderRadius: '5px', fontSize: '13px', height: '50px' }}
                 >
                   Sign Up
                 </Button>
               </Form.Item>
 
               <div className="text-center text-secondary">
-                <Text>Already have an account? </Text>
+                <Text
+                  style={{ fontWeight: '300', fontSize: '12px' }}
+                  className="text-[rgb(75 85 99)] text-[11px]"
+                >
+                  Already have an account?{' '}
+                </Text>
                 <Link href="/auth/login">
                   <Text className="text-primary hover:text-primary-dark cursor-pointer">Login</Text>
                 </Link>
@@ -147,13 +170,12 @@ function SignupForm() {
         </Col>
 
         {/* Right Side - Full-Height, Full-Width Image */}
-        <Col xs={0} md={14} className="p-0 m-0" style={{ padding: 0, margin: 0 }}>
+        <Col xs={0} md={13} className="p-0 m-0" style={{ padding: 0, margin: 0 }}>
           <div
             style={{
               position: 'relative',
               width: '100%',
-              height: '112vh',
-              overflow: 'hidden',
+              height: '100%',
             }}
           >
             <Image

@@ -3,6 +3,8 @@ import { Manrope } from 'next/font/google';
 import LayoutWrapper from './components/LayoutWrapper';
 import 'antd/dist/reset.css';
 import { AuthProvider } from '@/context/AuthContext';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const manrope = Manrope({
   subsets: ['latin'],
@@ -22,6 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <AuthProvider>
           <LayoutWrapper>{children}</LayoutWrapper>
+          <ToastContainer />
         </AuthProvider>
       </body>
     </html>
