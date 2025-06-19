@@ -50,7 +50,7 @@ const PublicProfilePage = () => {
           <div className="w-full max-w-4xl">
             <iframe
               className="w-full h-[220px] sm:h-[300px] md:h-[400px] rounded-xl shadow-lg"
-              src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+              src="https://www.youtube.com/embed/2X3p_yV19Ms"
               title="YouTube video"
               allowFullScreen
             ></iframe>
@@ -207,7 +207,7 @@ const PublicProfilePage = () => {
           >
             <iframe
               className="w-full h-[220px] sm:h-[300px] md:h-[400px] rounded-xl shadow-lg"
-              src="https://www.youtube.com/embed/kJQP7kiw5Fk"
+              src="https://www.youtube.com/embed/2X3p_yV19Ms"
               title="YouTube video 2"
               allowFullScreen
             ></iframe>

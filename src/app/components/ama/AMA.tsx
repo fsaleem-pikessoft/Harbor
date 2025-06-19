@@ -1,6 +1,6 @@
 'use client';
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Row, Col, Card, Button, Tabs, Modal, Avatar } from 'antd';
+import { Row, Col, Card, Button, Tabs, Modal, Avatar, Radio, Upload, message } from 'antd';
 import {
   VideoCameraOutlined,
   PlayCircleOutlined,
@@ -12,7 +12,13 @@ import {
   CameraOutlined,
   ClockCircleOutlined,
   FileImageOutlined,
+  CheckCircleTwoTone,
+  CheckCircleOutlined,
+  StopOutlined,
+  ArrowRightOutlined,
+  UploadOutlined,
 } from '@ant-design/icons';
+import type { UploadFile } from 'antd';
 
 const AMA = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -27,6 +33,32 @@ const AMA = () => {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const [inputMode, setInputMode] = useState<'record' | 'upload' | 'text'>('record');
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const questions = [
+    'What inspired you to start your career?',
+    'How do you handle challenges in your work?',
+    'What is your favorite project and why?',
+    'How do you stay motivated during difficult times?',
+    'What advice would you give to beginners?',
+    'How do you manage your time effectively?',
+    'What are your future goals and aspirations?',
+    'How do you learn new skills efficiently?',
+    'What is your daily routine like?',
+    'How do you balance work and personal life?',
+    'What tools do you use in your workflow?',
+    'How do you handle project deadlines?',
+    "What's your approach to problem-solving?",
+    'How do you stay updated with industry trends?',
+    "What's your biggest professional achievement?",
+    'How do you handle team conflicts?',
+    "What's your preferred learning method?",
+    'How do you measure success in your work?',
+    "What's your strategy for networking?",
+    'How do you maintain work-life balance?',
+  ];
+  const [completedQuestions, setCompletedQuestions] = useState(Array(questions.length).fill(false));
+  const [videoList, setVideoList] = useState<UploadFile<any>[]>([]);
 
   const showPermissionModal = () => {
     setIsPermissionModalVisible(true);
@@ -260,92 +292,329 @@ const AMA = () => {
 
   return (
     <div className="p-4">
-      <Row gutter={[16, 16]}>
-        <Col xs={24} lg={16}>
+      <Row gutter={[16, 16]} style={{ minHeight: 500 }}>
+        <Col xs={24} lg={16} className="h-full">
           <Card
             title={
-              <div className="flex items-center">
-                <Avatar
-                  icon={isRecording ? <VideoCameraOutlined /> : <CameraOutlined />}
-                  style={{
-                    backgroundColor: isRecording ? '#ff4d4f' : '#1890ff',
-                    marginRight: '12px',
-                  }}
-                />
-                {!isRecording && !recordedVideo
-                  ? 'Record Your Question'
-                  : isRecording
-                  ? isPaused
-                    ? 'Recording Paused'
-                    : 'Recording in Progress'
-                  : 'Your Recorded Question'}
+              <div
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+              >
+                <div className="flex items-center">
+                  <Avatar
+                    icon={isRecording ? <VideoCameraOutlined /> : <CameraOutlined />}
+                    style={{
+                      backgroundColor: isRecording ? '#ff4d4f' : '#1890ff',
+                      marginRight: '12px',
+                    }}
+                  />
+                  {!isRecording && !recordedVideo
+                    ? 'Record Your Question'
+                    : isRecording
+                    ? isPaused
+                      ? 'Recording Paused'
+                      : 'Recording in Progress'
+                    : 'Your Recorded Question'}
+                </div>
+                <div>
+                  <Radio
+                    checked={inputMode === 'record'}
+                    onChange={() => setInputMode('record')}
+                    style={{ marginRight: 16 }}
+                  >
+                    Record
+                  </Radio>
+                  <Radio
+                    checked={inputMode === 'upload'}
+                    onChange={() => setInputMode('upload')}
+                    style={{ marginRight: 16 }}
+                  >
+                    Upload
+                  </Radio>
+                  <Radio checked={inputMode === 'text'} onChange={() => setInputMode('text')}>
+                    Text
+                  </Radio>
+                </div>
               </div>
             }
             className="h-full"
+            bodyStyle={{
+              minHeight: 400,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'flex-start',
+              height: '100%',
+            }}
           >
-            <Tabs activeKey={activeTab} onChange={setActiveTab} items={items} className="mb-2" />
-            <div className="flex justify-end gap-4">
-              {!isRecording && !recordedVideo ? (
-                <Button
-                  type="primary"
-                  onClick={startRecording}
-                  size="large"
-                  style={{ borderRadius: '5px', fontSize: '10px', height: '30px' }}
-                  disabled={hasPermission === false}
-                  icon={<VideoCameraOutlined />}
-                >
-                  Start Recording
-                </Button>
-              ) : isRecording ? (
-                <div className="flex gap-4">
-                  {isPaused ? (
+            <div className="flex-1 flex flex-col justify-between h-full">
+              {inputMode === 'record' && (
+                <>
+                  <Tabs
+                    activeKey={activeTab}
+                    onChange={setActiveTab}
+                    items={items}
+                    className="mb-2"
+                  />
+                  <div className="pt-6 pb-2 border-t flex justify-center gap-2">
+                    {!isRecording && !recordedVideo && inputMode === 'record' && (
+                      <Button
+                        type="primary"
+                        onClick={startRecording}
+                        size="large"
+                        style={{ borderRadius: '5px', fontSize: '10px', height: '30px' }}
+                        disabled={hasPermission === false}
+                        icon={<VideoCameraOutlined />}
+                      >
+                        Record
+                      </Button>
+                    )}
+                    {isRecording && inputMode === 'record' && (
+                      <>
+                        {isPaused ? (
+                          <Button
+                            type="primary"
+                            onClick={resumeRecording}
+                            size="large"
+                            icon={<PlayCircleFilled />}
+                            style={{ borderRadius: '5px', fontSize: '10px', height: '30px' }}
+                          >
+                            Resume
+                          </Button>
+                        ) : (
+                          <Button
+                            type="primary"
+                            onClick={pauseRecording}
+                            size="large"
+                            icon={<PauseCircleOutlined />}
+                            style={{ borderRadius: '5px', fontSize: '10px', height: '30px' }}
+                          >
+                            Pause
+                          </Button>
+                        )}
+                        <Button
+                          danger
+                          onClick={stopRecording}
+                          size="large"
+                          icon={<StopOutlined />}
+                          style={{ borderRadius: '5px', fontSize: '10px', height: '30px' }}
+                        >
+                          Stop
+                        </Button>
+                      </>
+                    )}
                     <Button
                       type="primary"
-                      onClick={resumeRecording}
-                      size="large"
-                      icon={<PlayCircleFilled />}
+                      onClick={() => {
+                        setCompletedQuestions((prev) => {
+                          const updated = [...prev];
+                          updated[currentQuestion] = true;
+                          return updated;
+                        });
+                      }}
                       style={{ borderRadius: '5px', fontSize: '10px', height: '30px' }}
+                      disabled={completedQuestions[currentQuestion]}
+                      icon={<CheckCircleOutlined />}
                     >
-                      Resume
+                      Submit
                     </Button>
-                  ) : (
+                    <Button
+                      onClick={() => {
+                        if (currentQuestion < questions.length - 1) {
+                          setCurrentQuestion(currentQuestion + 1);
+                        }
+                      }}
+                      style={{ borderRadius: '5px', fontSize: '10px', height: '30px' }}
+                      disabled={currentQuestion === questions.length - 1}
+                      icon={<ArrowRightOutlined />}
+                    >
+                      Next
+                    </Button>
+                  </div>
+                </>
+              )}
+              {inputMode === 'upload' && (
+                <>
+                  <Row justify="center" className="w-full">
+                    <Col xs={24} sm={20} md={16} lg={20} className="flex flex-col items-center">
+                      <Upload.Dragger
+                        name="video"
+                        fileList={videoList}
+                        beforeUpload={(file) => {
+                          const isVideo = file.type.startsWith('video/');
+                          if (!isVideo) {
+                            message.error('Only video files are allowed.');
+                            return false;
+                          }
+                          const isLt100M = file.size / 1024 / 1024 < 100;
+                          if (!isLt100M) {
+                            message.error('Video must be smaller than 100MB.');
+                            return false;
+                          }
+                          return false;
+                        }}
+                        onChange={({ fileList }) => setVideoList(fileList.slice(-1))}
+                        maxCount={1}
+                        accept="video/*"
+                        multiple={false}
+                        showUploadList={true}
+                        style={{
+                          background: '#f5f9ff',
+                          border: '2px dashed #a0c4f7',
+                          borderRadius: '24px',
+                          minHeight: 320,
+                          minWidth: 320,
+                          maxWidth: 520,
+                          margin: '0 auto',
+                          boxShadow: '0 4px 24px 0 rgba(80, 120, 200, 0.08)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          transition: 'border-color 0.3s',
+                        }}
+                      >
+                        <div className="flex flex-col items-center justify-center w-full">
+                          <div className="flex items-center justify-center mb-3">
+                            <div className="bg-white rounded-full shadow p-5 flex items-center justify-center border border-blue-200">
+                              <UploadOutlined style={{ fontSize: 38, color: '#2563eb' }} />
+                            </div>
+                          </div>
+                          <span className="text-lg font-semibold text-gray-700 mb-1">
+                            Drop files here to upload
+                          </span>
+                          <span className="text-sm text-gray-500">
+                            or click to select a video (max 100MB)
+                          </span>
+                        </div>
+                      </Upload.Dragger>
+                      {videoList.length > 0 && videoList[0].originFileObj && (
+                        <video
+                          src={URL.createObjectURL(videoList[0].originFileObj)}
+                          controls
+                          className="mt-4 rounded shadow max-w-full"
+                          style={{ maxHeight: 240 }}
+                        />
+                      )}
+                    </Col>
+                  </Row>
+                  <div className="pt-6 pb-2 border-t flex justify-center gap-2">
                     <Button
                       type="primary"
-                      onClick={pauseRecording}
-                      size="large"
-                      icon={<PauseCircleOutlined />}
+                      onClick={() => {
+                        setCompletedQuestions((prev) => {
+                          const updated = [...prev];
+                          updated[currentQuestion] = true;
+                          return updated;
+                        });
+                      }}
                       style={{ borderRadius: '5px', fontSize: '10px', height: '30px' }}
+                      disabled={completedQuestions[currentQuestion]}
+                      icon={<CheckCircleOutlined />}
                     >
-                      Pause
+                      Submit
                     </Button>
-                  )}
-                  <Button
-                    danger
-                    onClick={stopRecording}
-                    size="large"
-                    style={{ borderRadius: '5px', fontSize: '10px', height: '30px' }}
-                  >
-                    Stop Recording
-                  </Button>
-                </div>
-              ) : (
-                <Button
-                  type="primary"
-                  onClick={startRecording}
-                  size="large"
-                  style={{ borderRadius: '5px', fontSize: '10px', height: '30px' }}
-                  disabled={hasPermission === false}
-                  icon={<VideoCameraOutlined />}
-                >
-                  Record Again
-                </Button>
+                    <Button
+                      onClick={() => {
+                        if (currentQuestion < questions.length - 1) {
+                          setCurrentQuestion(currentQuestion + 1);
+                        }
+                      }}
+                      style={{ borderRadius: '5px', fontSize: '10px', height: '30px' }}
+                      disabled={currentQuestion === questions.length - 1}
+                      icon={<ArrowRightOutlined />}
+                    >
+                      Next
+                    </Button>
+                  </div>
+                </>
+              )}
+              {inputMode === 'text' && (
+                <>
+                  <div className="flex flex-col h-full justify-center items-center">
+                    <textarea
+                      className="w-full h-72 p-2 border rounded"
+                      placeholder="Type your question here..."
+                    />
+                  </div>
+                  <div className="pt-6 pb-2 border-t flex justify-center gap-2">
+                    <Button
+                      type="primary"
+                      onClick={() => {
+                        setCompletedQuestions((prev) => {
+                          const updated = [...prev];
+                          updated[currentQuestion] = true;
+                          return updated;
+                        });
+                      }}
+                      style={{ borderRadius: '5px', fontSize: '10px', height: '30px' }}
+                      disabled={completedQuestions[currentQuestion]}
+                      icon={<CheckCircleOutlined />}
+                    >
+                      Submit
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        if (currentQuestion < questions.length - 1) {
+                          setCurrentQuestion(currentQuestion + 1);
+                        }
+                      }}
+                      style={{ borderRadius: '5px', fontSize: '10px', height: '30px' }}
+                      disabled={currentQuestion === questions.length - 1}
+                      icon={<ArrowRightOutlined />}
+                    >
+                      Next
+                    </Button>
+                  </div>
+                </>
               )}
             </div>
           </Card>
         </Col>
-
+        <Col xs={24} lg={8} className="h-full">
+          <Card
+            title="Questions"
+            className="h-full"
+            bodyStyle={{
+              height: '530px',
+              overflow: 'hidden',
+            }}
+          >
+            <div
+              className="scrollbar-hide"
+              style={{
+                height: '100%',
+                overflowY: 'auto',
+                msOverflowStyle: 'none',
+                scrollbarWidth: 'none',
+              }}
+            >
+              <style jsx>{`
+                .scrollbar-hide::-webkit-scrollbar {
+                  display: none;
+                }
+              `}</style>
+              {questions.map((q, idx) => (
+                <Card
+                  key={idx}
+                  className={`mb-2 m-1 cursor-pointer transition-all ${
+                    completedQuestions[idx] ? 'border-green-500 border-2' : ''
+                  } ${currentQuestion === idx ? 'ring-2 ring-blue-500 bg-blue-50' : ''}`}
+                  bodyStyle={{ padding: '10px' }}
+                  size="small"
+                  hoverable
+                  onClick={() => setCurrentQuestion(idx)}
+                >
+                  <div className="flex items-center justify-between">
+                    <span>{q}</span>
+                    {completedQuestions[idx] && (
+                      <CheckCircleTwoTone twoToneColor="#52c41a" className="ml-2" />
+                    )}
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </Card>
+        </Col>
         {/* Tips Card - Only show during recording */}
-        {isRecording && (
+        {isRecording && inputMode === 'record' && (
           <Col xs={24} lg={8}>
             <Card
               title={
@@ -412,7 +681,6 @@ const AMA = () => {
           </Col>
         )}
       </Row>
-
       <Modal
         title={
           <div className="flex items-center">

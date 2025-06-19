@@ -1,19 +1,17 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Card, Typography, Form, Button, Row, Col, Avatar } from 'antd';
+import { Card, Typography, Avatar, Tabs, Button } from 'antd';
 import {
   FacebookOutlined,
   LinkedinOutlined,
   InstagramOutlined,
   YoutubeOutlined,
   EyeOutlined,
-  InfoCircleOutlined,
-  PictureOutlined,
 } from '@ant-design/icons';
-import { useRouter } from 'next/navigation';
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
+const { TabPane } = Tabs;
 
 const LOCAL_STORAGE_KEY = 'profileData';
 
@@ -30,202 +28,126 @@ interface ProfileData {
 }
 
 const ProfilePage = () => {
-  const router = useRouter();
-  const [form] = Form.useForm();
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  // Load initial data
   useEffect(() => {
-    const loadInitialData = () => {
-      const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (saved) {
-        try {
-          const parsed: ProfileData = JSON.parse(saved);
-          console.log('Loading initial data:', parsed); // Debug log
-          setProfileData(parsed);
-          form.setFieldsValue({
-            firstName: parsed.firstName || '',
-            lastName: parsed.lastName || '',
-            tagLine: parsed.tagLine || '',
-            about: parsed.about || '',
-            facebook: parsed.facebook || '',
-            linkedin: parsed.linkedin || '',
-            instagram: parsed.instagram || '',
-            youtube: parsed.youtube || '',
-          });
-        } catch (error) {
-          console.error('Error loading initial data:', error);
-        }
+    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (saved) {
+      try {
+        const parsed: ProfileData = JSON.parse(saved);
+        setProfileData(parsed);
+      } catch (error) {
+        console.error('Error loading data:', error);
       }
-    };
+    }
+  }, []);
 
-    loadInitialData();
-  }, [form]);
+  const fullName =
+    profileData?.firstName && profileData?.lastName
+      ? `${profileData.firstName} ${profileData.lastName}`
+      : 'Rob Boyce';
+
+  const tagLine = profileData?.tagLine || 'Creative Developer & Mentor';
 
   return (
-    <div className="min-h-screen">
-      <div className="p-8">
-        <div className="flex justify-end mb-6">
-          <Row gutter={16}>
-            <Col>
-              <Button
-                type="primary"
-                size="large"
-                onClick={() => router.push('/auth/public-profile')}
-                style={{ borderRadius: '5px', fontSize: '13px', height: '30px' }}
-                className="bg-button hover:bg-button/80  rounded-none px-6 flex items-center shadow-sm hover:shadow-md transition-all duration-300"
-                icon={<EyeOutlined />}
-              >
-                View Profile
-              </Button>
-            </Col>
-          </Row>
-        </div>
-
-        {/* Profile Info Card */}
+    <div className="min-h-screen bg-[#f9f9fb] py-10 px-6">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+        {/* Profile Summary */}
         <Card
-          className="mb-6"
           bordered={false}
-          style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
-          bodyStyle={{ padding: '14px' }}
+          style={{
+            borderRadius: 16,
+            padding: 24,
+            textAlign: 'center',
+            boxShadow: '0 6px 20px rgba(0,0,0,0.08)',
+          }}
         >
-          <div className="flex flex-col items-center">
-            <Avatar
-              size={80}
-              src="/images/avatar.svg"
-              className="mb-1"
-              style={{ backgroundColor: '#3A57E8' }}
-            />
-            <Title level={2} className="mb-1 !text-3xl text-center">
-              {profileData?.firstName && profileData?.lastName
-                ? `${profileData.firstName} ${profileData.lastName}`
-                : 'Rob Boyce'}
-            </Title>
-            <Text className="text-gray-600 text-sm mt-[-16px]  text-center mb-2">
-              {profileData?.tagLine || 'Creative Developer & Mentor'}
-            </Text>
+          <Avatar
+            size={96}
+            src="/images/avatar.svg"
+            style={{
+              backgroundColor: '#3A57E8',
+              fontSize: 32,
+              marginBottom: 16,
+            }}
+          >
+            {profileData?.firstName?.[0]}
+            {profileData?.lastName?.[0]}
+          </Avatar>
+
+          <Title level={3} className="mb-1">
+            {fullName}
+          </Title>
+          <Text type="secondary">{tagLine}</Text>
+
+          <div className="flex justify-center gap-4 mt-6">
+            {profileData?.facebook && (
+              <a href={profileData.facebook} target="_blank" rel="noopener noreferrer">
+                <FacebookOutlined className="text-blue-600 text-xl hover:text-blue-800" />
+              </a>
+            )}
+            {profileData?.linkedin && (
+              <a href={profileData.linkedin} target="_blank" rel="noopener noreferrer">
+                <LinkedinOutlined className="text-blue-700 text-xl hover:text-blue-900" />
+              </a>
+            )}
+            {profileData?.instagram && (
+              <a href={profileData.instagram} target="_blank" rel="noopener noreferrer">
+                <InstagramOutlined className="text-pink-600 text-xl hover:text-pink-800" />
+              </a>
+            )}
+            {profileData?.youtube && (
+              <a href={profileData.youtube} target="_blank" rel="noopener noreferrer">
+                <YoutubeOutlined className="text-red-600 text-xl hover:text-red-800" />
+              </a>
+            )}
           </div>
+
+          <Button
+            type="primary"
+            className="mt-6 w-full bg-blue-600 hover:bg-blue-700 transition rounded-lg"
+            loading={loading}
+            onClick={() => {
+              setLoading(true);
+              window.open('/auth/public-profile', '_blank');
+              setTimeout(() => setLoading(false), 1000);
+            }}
+            icon={<EyeOutlined />}
+          >
+            View Profile
+          </Button>
         </Card>
 
-        {/* Two Column Layout */}
-        <Row gutter={24}>
-          {/* About Section */}
-          <Col xs={24} md={12}>
-            <Card
-              title={
-                <span className="flex items-center">
-                  <Avatar
-                    icon={<InfoCircleOutlined />}
-                    style={{
-                      backgroundColor: '#3A57E8',
-                      marginRight: '12px',
-                    }}
-                  />
-                  About
-                </span>
-              }
-              className="h-full"
-              bordered={false}
-              style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
-            >
-              <Text className="text-gray-600 whitespace-pre-wrap">
-                {profileData?.about ||
-                  `Welcome to my professional profile! I am a dedicated professional with a passion for excellence and innovation. With extensive experience in my field, I strive to deliver exceptional results and create meaningful impact.
+        {/* Info Tabs */}
+        <div className="md:col-span-2">
+          <Card
+            bordered={false}
+            style={{ borderRadius: 16, boxShadow: '0 6px 20px rgba(0,0,0,0.08)' }}
+          >
+            <Tabs defaultActiveKey="1" size="large">
+              <TabPane tab="About Me" key="1">
+                <Paragraph className="text-gray-700 text-base leading-7 whitespace-pre-wrap">
+                  {`I'm a passionate and driven developer with a strong focus on building intuitive and impactful digital experiences. With a deep understanding of modern web technologies and design principles, I take pride in crafting solutions that are both user-friendly and performance-oriented.\n\nI believe in continuous learning, clean code, and the power of collaboration. Whether it's developing a sleek frontend, solving backend challenges, or bringing ideas to life through creative design — I'm always excited to push boundaries and make a difference through technology.`}
+                </Paragraph>
+              </TabPane>
 
-My expertise spans across various domains, and I am committed to continuous learning and growth. I believe in collaboration, creativity, and maintaining high standards in everything I do.
-
-Feel free to connect with me to explore potential opportunities for collaboration or to learn more about my professional journey.`}
-              </Text>
-            </Card>
-          </Col>
-
-          {/* Media Gallery Section */}
-          <Col xs={24} md={12}>
-            <Card
-              title={
-                <span className="flex items-center">
-                  <Avatar
-                    icon={<PictureOutlined />}
-                    style={{
-                      backgroundColor: '#1890ff',
-                      marginRight: '12px',
-                    }}
-                  />
-                  Media Gallery
-                </span>
-              }
-              className="h-full"
-              bordered={false}
-              style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
-            >
-              {profileData?.videos?.[0] ? (
-                <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                  <video
-                    key={profileData.videos[0]}
-                    src={profileData.videos[0]}
-                    controls
-                    className="absolute top-0 left-0 w-full h-full rounded-lg"
-                    style={{
-                      backgroundColor: '#000',
-                    }}
-                    preload="metadata"
-                    controlsList="nodownload"
-                  />
+              <TabPane tab="Video Intro" key="2">
+                <div className="flex w-full">
+                  <div className="relative w-full pb-[56.25%]">
+                    <iframe
+                      src="https://www.youtube.com/embed/2X3p_yV19Ms"
+                      className="absolute top-0 left-0 w-full h-full rounded-lg shadow-lg"
+                      style={{ border: 0 }}
+                      allowFullScreen
+                      title="YouTube video"
+                    />
+                  </div>
                 </div>
-              ) : (
-                <div className="flex items-center justify-center h-48 bg-gray-50 rounded-lg">
-                  <Text className="text-gray-400">No video uploaded yet</Text>
-                </div>
-              )}
-            </Card>
-          </Col>
-        </Row>
-
-        {/* Social Media Links */}
-        {profileData && (
-          <div className="flex justify-center gap-4 mt-8">
-            {profileData.facebook && (
-              <a
-                href={profileData.facebook}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-800"
-              >
-                <FacebookOutlined style={{ fontSize: '24px' }} />
-              </a>
-            )}
-            {profileData.linkedin && (
-              <a
-                href={profileData.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-700 hover:text-blue-900"
-              >
-                <LinkedinOutlined style={{ fontSize: '24px' }} />
-              </a>
-            )}
-            {profileData.instagram && (
-              <a
-                href={profileData.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-pink-600 hover:text-pink-800"
-              >
-                <InstagramOutlined style={{ fontSize: '24px' }} />
-              </a>
-            )}
-            {profileData.youtube && (
-              <a
-                href={profileData.youtube}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-red-600 hover:text-red-800"
-              >
-                <YoutubeOutlined style={{ fontSize: '24px' }} />
-              </a>
-            )}
-          </div>
-        )}
+              </TabPane>
+            </Tabs>
+          </Card>
+        </div>
       </div>
     </div>
   );
