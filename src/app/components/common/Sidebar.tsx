@@ -12,9 +12,12 @@ import {
   SettingOutlined,
   UserOutlined,
   ClockCircleOutlined,
+  FileOutlined,
 } from '@ant-design/icons';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import type { RootState } from '@/app/redux/store';
 
 const { Sider } = Layout;
 
@@ -27,12 +30,13 @@ const Sidebar = ({ collapsed, onCollapse }: SidebarProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const [selectedKey, setSelectedKey] = useState('/tickers');
+  const roles = useSelector((state: RootState) => state.role.roles);
 
   useEffect(() => {
     setSelectedKey(pathname);
   }, [pathname]);
 
-  const items = [
+  let items = [
     { key: '/dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
     { key: '/profile', icon: <UserOutlined />, label: 'Profile' },
     { key: '/library', icon: <BookOutlined />, label: 'Library' },
@@ -42,6 +46,14 @@ const Sidebar = ({ collapsed, onCollapse }: SidebarProps) => {
     { key: '/ama', icon: <MessageOutlined />, label: 'AMA' },
     { key: '/settings', icon: <SettingOutlined />, label: 'Settings' },
   ];
+
+  if (roles.includes('Admin')) {
+    items = [
+      { key: '/admin/adminDashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
+      { key: '/admin/adminProfile', icon: <FileOutlined />, label: 'Profile' },
+      { key: '/admin/adminAma', icon: <MessageOutlined />, label: 'AMA' },
+    ];
+  }
 
   return (
     <Sider

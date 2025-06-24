@@ -8,7 +8,7 @@ import { toast } from 'react-toastify';
 interface AuthContextType {
   isAuthenticated: boolean;
   loading: boolean;
-  login: (token: string) => void;
+  login: (token: string, roles: string[]) => void;
   logout: () => void;
 }
 
@@ -25,10 +25,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setLoading(false);
   }, []);
 
-  const login = (token: string) => {
+  const login = (token: string, roles: string[]) => {
     Cookies.set('token', token, { expires: 7 }); // 7-day expiry
     setIsAuthenticated(true);
-    router.push('/dashboard'); // adjust to your main route
+    if (roles.includes('Admin')) {
+      router.push('/admin/adminDashboard');
+    } else {
+      router.push('/dashboard');
+    }
   };
 
   const logout = () => {

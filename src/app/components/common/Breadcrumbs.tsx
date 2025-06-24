@@ -2,7 +2,6 @@
 
 import { Breadcrumb } from 'antd';
 import { HomeOutlined } from '@ant-design/icons';
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const Breadcrumbs = () => {
@@ -12,11 +11,7 @@ const Breadcrumbs = () => {
     const paths = pathname.split('/').filter(Boolean);
     const items = [
       {
-        title: (
-          <Link href="/">
-            <HomeOutlined />
-          </Link>
-        ),
+        title: <HomeOutlined />,
       },
     ];
 

@@ -9,7 +9,6 @@ import { userLogin } from '@/api/authApi';
 import { useAuth } from '@/context/AuthContext';
 import Image from 'next/image';
 import { toast } from 'react-toastify';
-
 const { Title, Text } = Typography;
 
 interface LoginFormValues {
@@ -38,10 +37,12 @@ function LoginForm() {
 
   const { mutate: mutateLogin, isPending } = useMutation({
     mutationFn: (data: LoginFormValues) => userLogin(data),
-    onSuccess: (res: LoginResponse) => {
+    onSuccess: (res: LoginResponse & { data: { roles?: string[] } }) => {
+      debugger;
       const token = res?.data?.token || res?.data?.token;
+      const roles = res?.data?.roles || [];
       if (token) {
-        login(token);
+        login(token, roles);
         toast.success('Login Successfully');
       } else {
         toast.error('No token returned from server');

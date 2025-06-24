@@ -7,6 +7,8 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { meAuth } from '@/api/authApi';
 import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { setRoles } from '@/app/redux/store/slices/roleSlice';
 
 const { Header: AntHeader } = Layout;
 
@@ -27,6 +29,7 @@ function HeaderContent() {
   const router = useRouter();
   const { logout } = useAuth();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const dispatch = useDispatch();
 
   const userMenuItems: MenuProps['items'] = [
     {
@@ -53,6 +56,9 @@ function HeaderContent() {
     mutationFn: () => meAuth(),
     onSuccess: (res) => {
       setUserInfo(res?.data?.info);
+      if (res?.data?.roles) {
+        dispatch(setRoles(res.data.roles));
+      }
     },
     onError: (error: ApiError) => {
       message.error(error?.response?.data);
