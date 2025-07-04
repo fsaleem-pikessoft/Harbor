@@ -1,5 +1,4 @@
 'use client';
-
 import './globals.css';
 import { Manrope } from 'next/font/google';
 import LayoutWrapper from './components/LayoutWrapper';
