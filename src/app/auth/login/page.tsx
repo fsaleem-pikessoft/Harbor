@@ -43,6 +43,7 @@ function LoginForm() {
       const roles = res?.data?.roles || [];
       if (token) {
         login(token, roles);
+
         toast.success('Login Successfully');
       } else {
         toast.error('No token returned from server');
@@ -71,7 +72,7 @@ function LoginForm() {
               className="text-secondary-dark  mb-1"
               style={{ fontSize: '20px', fontWeight: '500' }}
             >
-              I M APP
+              IM APP
             </Title>
             <Text className="text-[rgb(75 85 99)] text-[11px] block">
               Transforms identity into a living platform

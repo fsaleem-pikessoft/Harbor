@@ -16,7 +16,7 @@ const columns = [
     key: 'firstName',
     render: (text: string, record: any) => (
       <Link
-        href={`/admin/adminProfile/${record.userId}`}
+        href={`/admin/adminQuestions/${record.userId}`}
         style={{ fontWeight: 300, fontSize: '12px', color: '#1677ff', cursor: 'pointer' }}
       >
         {text}
@@ -74,12 +74,12 @@ const columns = [
   },
 ];
 
-const AdminProfile = () => {
+const AdminQuestions = () => {
   const [profileData, setProfileData] = useState([]);
-  const { mutate: mutateGetAllProfiles } = useMutation({
+
+  const { mutate: mutateGetAllProfiles, isPending: isProfilesLoading } = useMutation({
     mutationFn: () => getAllProfiles(),
     onSuccess: (res) => {
-      debugger;
       setProfileData(res?.data);
     },
     onError: (error: any) => {
@@ -90,6 +90,7 @@ const AdminProfile = () => {
   useEffect(() => {
     mutateGetAllProfiles();
   }, []);
+
   return (
     <>
       <Breadcrumb style={{ marginBottom: 16 }}>
@@ -97,21 +98,22 @@ const AdminProfile = () => {
           <HomeOutlined />
         </Breadcrumb.Item>
         <Breadcrumb.Item>Archetypes OS</Breadcrumb.Item>
-        <Breadcrumb.Item>Profile</Breadcrumb.Item>
+        <Breadcrumb.Item>Questions</Breadcrumb.Item>
       </Breadcrumb>
       <div style={{ background: 'white', borderRadius: 12, padding: 24 }}>
-        <h2 style={{ fontWeight: 700, fontSize: 24, marginBottom: 24 }}>Admin Profile</h2>
+        <h2 style={{ fontWeight: 700, fontSize: 24, marginBottom: 24 }}>Questions</h2>
         <Table
           columns={columns}
           dataSource={profileData.map((item: any) => ({
             ...item,
-            key: item.id || item.userId, // ensure unique key for each row
+            key: item.id || item.userId,
           }))}
           pagination={false}
           bordered={false}
           rowClassName={() => 'custom-row'}
           showHeader
           style={{ background: 'white' }}
+          loading={isProfilesLoading}
         />
         <style jsx global>{`
           .custom-row td {
@@ -129,4 +131,4 @@ const AdminProfile = () => {
   );
 };
 
-export default AdminProfile;
+export default AdminQuestions;

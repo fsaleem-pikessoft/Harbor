@@ -59,7 +59,7 @@ function SignupForm() {
               className="text-secondary-dark font-bold mb-1"
               style={{ fontSize: '20px', fontWeight: '500' }}
             >
-              I M APP
+              IM APP
             </Title>
             <Text className="text-[rgb(75 85 99)] text-[11px] block">
               Transforms identity into a living platform

@@ -1,10 +1,47 @@
 'use client';
 
+import { useMutation } from '@tanstack/react-query';
+import React, { useEffect, useState } from 'react';
 import { Avatar, Button, Carousel, Card } from 'antd';
 import { YoutubeOutlined, FacebookOutlined, LinkedinOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
+import { getProfile } from '@/api/profileApi';
+import { toast } from 'react-toastify';
+
+interface ProfileData {
+  firstName?: string;
+  lastName?: string;
+  tagLine?: string;
+  about?: string;
+  facebook?: string;
+  linkedin?: string;
+  instagram?: string;
+  youtube?: string;
+  videos?: string[];
+  interests?: string[];
+  industries?: string[];
+  avatar?: string;
+  introVideo?: string;
+  introText?: string;
+}
 
 const PublicProfilePage = () => {
+  const [profileData, setProfileData] = useState<ProfileData | null>(null);
+
+  const { mutate: mutateGetProfile } = useMutation({
+    mutationFn: () => getProfile(),
+    onSuccess: (res) => {
+      setProfileData(res?.data);
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data);
+    },
+  });
+
+  useEffect(() => {
+    mutateGetProfile();
+  }, []);
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -31,7 +68,7 @@ const PublicProfilePage = () => {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="text-2xl md:text-4xl font-bold mb-1"
         >
-          Rob Boyce
+          {profileData?.firstName} {profileData?.lastName}
         </motion.h1>
         <motion.p
           initial={{ opacity: 0, x: -50 }}
@@ -39,7 +76,7 @@ const PublicProfilePage = () => {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="text-lg md:text-lg"
         >
-          Creative Developer & Mentor
+          {profileData?.tagLine}
         </motion.p>
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -228,7 +265,7 @@ const PublicProfilePage = () => {
           whileInView={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <Avatar size={128} src="https://i.pravatar.cc/300" className="shadow-lg" />
+          <Avatar size={128} src="/images/avatar.svg" className="shadow-lg" />
         </motion.div>
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
@@ -236,7 +273,7 @@ const PublicProfilePage = () => {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="mt-4 text-2xl font-semibold"
         >
-          Rob Boyce
+          {profileData?.firstName} {profileData?.lastName}
         </motion.h2>
         <motion.p
           initial={{ opacity: 0, y: 20 }}
@@ -244,7 +281,7 @@ const PublicProfilePage = () => {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="text-gray-500"
         >
-          Building digital experiences
+          {profileData?.tagLine}
         </motion.p>
         <motion.div
           initial={{ opacity: 0, y: 20 }}

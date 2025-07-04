@@ -13,6 +13,7 @@ import {
   UserOutlined,
   ClockCircleOutlined,
   FileOutlined,
+  QuestionCircleOutlined,
 } from '@ant-design/icons';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -51,6 +52,8 @@ const Sidebar = ({ collapsed, onCollapse }: SidebarProps) => {
     items = [
       { key: '/admin/adminDashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
       { key: '/admin/adminProfile', icon: <FileOutlined />, label: 'Profile' },
+      { key: '/admin/adminQuestions', icon: <QuestionCircleOutlined />, label: 'Questions' },
+      { key: '/admin/adminArctype', icon: <FileOutlined />, label: 'Arctype' },
       { key: '/admin/adminAma', icon: <MessageOutlined />, label: 'AMA' },
     ];
   }
@@ -84,7 +87,7 @@ const Sidebar = ({ collapsed, onCollapse }: SidebarProps) => {
         }}
       >
         {!collapsed && (
-          <div style={{ fontSize: '20px', fontWeight: 600, textAlign: 'center' }}>I M APP</div>
+          <div style={{ fontSize: '20px', fontWeight: 600, textAlign: 'center' }}>IM APP</div>
         )}
         <div
           onClick={() => onCollapse(!collapsed)}

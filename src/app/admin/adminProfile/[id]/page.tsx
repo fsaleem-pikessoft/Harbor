@@ -1,5 +1,6 @@
 'use client';
-
+import { useParams } from 'next/navigation';
+import { useMutation } from '@tanstack/react-query';
 import React, { useEffect, useState } from 'react';
 import {
   Card,
@@ -27,12 +28,12 @@ import {
   TagsOutlined,
   HistoryOutlined,
 } from '@ant-design/icons';
+import { getProfileById } from '@/api/profileApi';
+import { toast } from 'react-toastify';
 
 const { Title, Text, Paragraph } = Typography;
 const { TabPane } = Tabs;
 const { Option } = Select;
-
-const LOCAL_STORAGE_KEY = 'profileData';
 
 interface ProfileData {
   firstName?: string;
@@ -72,30 +73,25 @@ const MOCK_SOCIAL_MEDIA = {
 };
 
 const AdminDetailPage = () => {
-  //const { id } = useParams();
+  const { id } = useParams();
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [archetype, setArchetype] = useState<string | undefined>(undefined);
 
+  const { mutate: mutateGetProfileById } = useMutation({
+    mutationFn: (id: any) => getProfileById(id),
+    onSuccess: (res) => {
+      setProfileData(res?.data?.entity);
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data);
+    },
+  });
+
   useEffect(() => {
-    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (saved) {
-      try {
-        const parsed: ProfileData = JSON.parse(saved);
-        setProfileData(parsed);
-      } catch (error) {
-        console.error('Error loading data:', error);
-      }
-    }
-  }, []);
-
-  const fullName =
-    profileData?.firstName && profileData?.lastName
-      ? `${profileData.firstName} ${profileData.lastName}`
-      : 'Rob Boyce';
-
-  const tagLine = profileData?.tagLine || 'Creative Developer & Mentor';
+    mutateGetProfileById(id);
+  }, [id]);
 
   return (
     <>
@@ -137,8 +133,8 @@ const AdminDetailPage = () => {
                     }}
                     className="hover:opacity-90 transition-opacity cursor-pointer"
                   >
-                    {profileData?.firstName?.[0]}
-                    {profileData?.lastName?.[0]}
+                    {profileData?.firstName}
+                    {profileData?.lastName}
                   </Avatar>
                   <div className="absolute bottom-5 right-0 w-8 h-8 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
                     <div className="w-3 h-3 bg-white rounded-full"></div>
@@ -146,9 +142,9 @@ const AdminDetailPage = () => {
                 </div>
 
                 <Title level={3} className="mb-1">
-                  {fullName}
+                  {profileData?.firstName} {profileData?.lastName}
                 </Title>
-                <Text type="secondary">{tagLine}</Text>
+                <Text type="secondary">{profileData?.tagLine}</Text>
 
                 <div className="flex justify-center gap-4 mt-6">
                   <a
@@ -262,8 +258,7 @@ const AdminDetailPage = () => {
                     <Tabs defaultActiveKey="1" size="large">
                       <TabPane tab="About Me" key="1">
                         <Paragraph className="text-gray-700 text-base leading-7 whitespace-pre-wrap">
-                          {profileData?.about ||
-                            `I'm a passionate and driven developer with a strong focus on building intuitive and impactful digital experiences. With a deep understanding of modern web technologies and design principles, I take pride in crafting solutions that are both user-friendly and performance-oriented.\n\nI believe in continuous learning, clean code, and the power of collaboration. Whether it's developing a sleek frontend, solving backend challenges, or bringing ideas to life through creative design`}
+                          {profileData?.about || `No about me`}
                         </Paragraph>
                       </TabPane>
 

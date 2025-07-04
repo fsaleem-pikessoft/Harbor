@@ -1,4 +1,5 @@
 'use client';
+import { useMutation } from '@tanstack/react-query';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Row, Col, Card, Button, Tabs, Modal, Avatar, Radio, Upload, message } from 'antd';
 import {
@@ -19,6 +20,21 @@ import {
   UploadOutlined,
 } from '@ant-design/icons';
 import type { UploadFile } from 'antd';
+import { toast } from 'react-toastify';
+import { getUserQuestionById, submitAnswer } from '@/api/amaApi';
+import { getProfile } from '@/api/profileApi';
+
+interface Question {
+  id: number;
+  title: string;
+  description: string;
+  status?: string;
+  answerText?: string;
+  answerVideoUrl?: string;
+  userId?: number;
+  userQuestionId?: number;
+  createdOn?: string;
+}
 
 const AMA = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -35,30 +51,11 @@ const AMA = () => {
   const chunksRef = useRef<Blob[]>([]);
   const [inputMode, setInputMode] = useState<'record' | 'upload' | 'text'>('record');
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const questions = [
-    'What inspired you to start your career?',
-    'How do you handle challenges in your work?',
-    'What is your favorite project and why?',
-    'How do you stay motivated during difficult times?',
-    'What advice would you give to beginners?',
-    'How do you manage your time effectively?',
-    'What are your future goals and aspirations?',
-    'How do you learn new skills efficiently?',
-    'What is your daily routine like?',
-    'How do you balance work and personal life?',
-    'What tools do you use in your workflow?',
-    'How do you handle project deadlines?',
-    "What's your approach to problem-solving?",
-    'How do you stay updated with industry trends?',
-    "What's your biggest professional achievement?",
-    'How do you handle team conflicts?',
-    "What's your preferred learning method?",
-    'How do you measure success in your work?',
-    "What's your strategy for networking?",
-    'How do you maintain work-life balance?',
-  ];
-  const [completedQuestions, setCompletedQuestions] = useState(Array(questions.length).fill(false));
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [videoList, setVideoList] = useState<UploadFile<any>[]>([]);
+  const [userId, setUserId] = useState(0);
+  const [completedQuestions, setCompletedQuestions] = useState<{ [key: number]: boolean }>({});
+  const [textAnswer, setTextAnswer] = useState('');
 
   const showPermissionModal = () => {
     setIsPermissionModalVisible(true);
@@ -73,7 +70,6 @@ const AMA = () => {
     setIsPermissionModalVisible(false);
   };
 
-  // Function to reset recording state
   const resetRecordingState = () => {
     setRecordedVideo(null);
     setRecordingTime(0);
@@ -82,7 +78,6 @@ const AMA = () => {
     chunksRef.current = [];
   };
 
-  // Function to start the video preview
   const startVideoPreview = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -97,6 +92,82 @@ const AMA = () => {
       showPermissionModal();
     }
   }, []);
+
+  const { mutate: mutateGetProfile } = useMutation({
+    mutationFn: () => getProfile(),
+    onSuccess: (res) => {
+      if (res && res.data) {
+        setUserId(Number(res.data.userId) || 0);
+      } else {
+        toast.error('No data received from server.');
+      }
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data);
+    },
+  });
+
+  const { mutate: mutateSubmitAnswer } = useMutation({
+    mutationFn: (data: any) => submitAnswer(data),
+    onSuccess: (res, variables) => {
+      toast.success(res?.data?.message);
+      mutateGetQuestions(userId);
+      setCompletedQuestions((prev) => {
+        const updated = { ...prev };
+        updated[variables.QuestionId] = true;
+        return updated;
+      });
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data || 'An error occurred while submitting answer.');
+    },
+  });
+
+  const { mutate: mutateGetQuestions } = useMutation({
+    mutationFn: (id: any) => getUserQuestionById(id),
+    onSuccess: (res) => {
+      if (res && res.data) {
+        if (Array.isArray(res.data) && res.data.length === 0) {
+          toast.info('No questions found.');
+          setQuestions([]);
+          return;
+        }
+        setQuestions(
+          res.data.map((item: any) => ({
+            id: item.questionId,
+            title: item.question?.title || '',
+            description: item.question?.description || '',
+            status: item.status,
+            answerText: item.answerText,
+            answerVideoUrl: item.answerVideoUrl,
+            userId: item.userId,
+            userQuestionId: item.id,
+            createdOn: item.createdOn,
+          }))
+        );
+
+        const completed = res.data.reduce((acc: any, item: any) => {
+          if (item.status === 'Submitted') {
+            acc[item.questionId] = true;
+          }
+          return acc;
+        }, {});
+        setCompletedQuestions(completed);
+      } else {
+        toast.error('No data received from server.');
+      }
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data || 'An error occurred while fetching questions.');
+    },
+  });
+
+  useEffect(() => {
+    mutateGetProfile();
+    if (userId) {
+      mutateGetQuestions(userId);
+    }
+  }, [userId]);
 
   // Start video preview when component mounts
   useEffect(() => {
@@ -212,6 +283,52 @@ const AMA = () => {
       } catch (error) {
         console.error('Error stopping recording:', error);
       }
+    }
+  };
+
+  const handleSubmitQuestion = async () => {
+    const selectedQuestion = questions.find((q) => q.id === currentQuestion);
+    if (!selectedQuestion || !userId) return;
+
+    if (inputMode === 'text' && textAnswer.trim()) {
+      const formData = new FormData();
+      formData.append('UserId', String(userId));
+      formData.append('QuestionId', String(selectedQuestion.id));
+      formData.append('Text', textAnswer);
+
+      console.log('Sending FormData for text answer');
+      mutateSubmitAnswer(formData);
+      setTextAnswer('');
+    } else if (inputMode === 'record' && recordedVideo) {
+      // Send as FormData for video
+      const formData = new FormData();
+      formData.append('UserId', String(userId));
+      formData.append('QuestionId', String(selectedQuestion.id));
+
+      const blob = await fetch(recordedVideo).then((res) => res.blob());
+      const file = new File([blob], 'recorded-video.webm', { type: 'video/webm' });
+      formData.append('Video', file);
+
+      console.log('Sending FormData for video');
+      mutateSubmitAnswer(formData);
+
+      // Reset after submit
+      setRecordedVideo(null);
+    } else if (inputMode === 'upload' && videoList.length > 0 && videoList[0].originFileObj) {
+      // Send as FormData for uploaded video
+      const formData = new FormData();
+      formData.append('UserId', String(userId));
+      formData.append('QuestionId', String(selectedQuestion.id));
+      formData.append('Video', videoList[0].originFileObj);
+
+      console.log('Sending FormData for uploaded video');
+      mutateSubmitAnswer(formData);
+
+      // Reset after submit
+      setVideoList([]);
+    } else {
+      alert('Please enter a text or upload a video.');
+      return;
     }
   };
 
@@ -403,15 +520,11 @@ const AMA = () => {
                     )}
                     <Button
                       type="primary"
-                      onClick={() => {
-                        setCompletedQuestions((prev) => {
-                          const updated = [...prev];
-                          updated[currentQuestion] = true;
-                          return updated;
-                        });
-                      }}
+                      onClick={handleSubmitQuestion}
                       style={{ borderRadius: '5px', fontSize: '10px', height: '30px' }}
-                      disabled={completedQuestions[currentQuestion]}
+                      disabled={
+                        questions.find((q) => q.id === currentQuestion)?.status === 'Submitted'
+                      }
                       icon={<CheckCircleOutlined />}
                     >
                       Submit
@@ -498,15 +611,11 @@ const AMA = () => {
                   <div className="pt-6 pb-2 border-t flex justify-center gap-2">
                     <Button
                       type="primary"
-                      onClick={() => {
-                        setCompletedQuestions((prev) => {
-                          const updated = [...prev];
-                          updated[currentQuestion] = true;
-                          return updated;
-                        });
-                      }}
+                      onClick={handleSubmitQuestion}
                       style={{ borderRadius: '5px', fontSize: '10px', height: '30px' }}
-                      disabled={completedQuestions[currentQuestion]}
+                      disabled={
+                        questions.find((q) => q.id === currentQuestion)?.status === 'Submitted'
+                      }
                       icon={<CheckCircleOutlined />}
                     >
                       Submit
@@ -532,20 +641,18 @@ const AMA = () => {
                     <textarea
                       className="w-full h-72 p-2 border rounded"
                       placeholder="Type your question here..."
+                      value={textAnswer}
+                      onChange={(e) => setTextAnswer(e.target.value)}
                     />
                   </div>
                   <div className="pt-6 pb-2 border-t flex justify-center gap-2">
                     <Button
                       type="primary"
-                      onClick={() => {
-                        setCompletedQuestions((prev) => {
-                          const updated = [...prev];
-                          updated[currentQuestion] = true;
-                          return updated;
-                        });
-                      }}
+                      onClick={handleSubmitQuestion}
                       style={{ borderRadius: '5px', fontSize: '10px', height: '30px' }}
-                      disabled={completedQuestions[currentQuestion]}
+                      disabled={
+                        questions.find((q) => q.id === currentQuestion)?.status === 'Submitted'
+                      }
                       icon={<CheckCircleOutlined />}
                     >
                       Submit
@@ -591,21 +698,34 @@ const AMA = () => {
                   display: none;
                 }
               `}</style>
-              {questions.map((q, idx) => (
+              {questions.map((q) => (
                 <Card
-                  key={idx}
+                  key={q.id}
                   className={`mb-2 m-1 cursor-pointer transition-all ${
-                    completedQuestions[idx] ? 'border-green-500 border-2' : ''
-                  } ${currentQuestion === idx ? 'ring-2 ring-blue-500 bg-blue-50' : ''}`}
-                  bodyStyle={{ padding: '10px' }}
+                    completedQuestions[q.id] ? 'border-green-500 border-2' : ''
+                  } ${currentQuestion === q.id ? 'ring-2 ring-blue-500 bg-blue-50' : ''}`}
+                  bodyStyle={{ padding: '10px', position: 'relative' }}
                   size="small"
                   hoverable
-                  onClick={() => setCurrentQuestion(idx)}
+                  onClick={() => setCurrentQuestion(q.id)}
                 >
-                  <div className="flex items-center justify-between">
-                    <span>{q}</span>
-                    {completedQuestions[idx] && (
-                      <CheckCircleTwoTone twoToneColor="#52c41a" className="ml-2" />
+                  <div style={{ position: 'relative', width: '100%' }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'flex-start',
+                        gap: 2,
+                      }}
+                    >
+                      <span style={{ fontWeight: 600 }}>{q.title}</span>
+                      <span style={{ color: '#555', fontSize: 13 }}>{q.description}</span>
+                    </div>
+                    {completedQuestions[q.id] && (
+                      <CheckCircleTwoTone
+                        twoToneColor="#52c41a"
+                        style={{ position: 'absolute', top: 8, right: 8, fontSize: 22 }}
+                      />
                     )}
                   </div>
                 </Card>

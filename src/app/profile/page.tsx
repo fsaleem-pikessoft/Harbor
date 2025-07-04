@@ -1,5 +1,6 @@
 'use client';
 
+import { useMutation } from '@tanstack/react-query';
 import React, { useEffect, useState } from 'react';
 import { Card, Typography, Avatar, Tabs, Button, Row, Col, Timeline, Tag } from 'antd';
 import {
@@ -11,21 +12,11 @@ import {
   TagsOutlined,
   HistoryOutlined,
 } from '@ant-design/icons';
+import { getProfile } from '@/api/profileApi';
+import { toast } from 'react-toastify';
 
 const { Title, Text, Paragraph } = Typography;
 const { TabPane } = Tabs;
-
-const LOCAL_STORAGE_KEY = 'profileData';
-
-const MOCK_INTERESTS = ['Web Development', 'UI/UX', 'Mentoring'];
-const MOCK_INDUSTRIES = ['Technology', 'Education'];
-
-const MOCK_SOCIAL_MEDIA = {
-  facebook: '',
-  linkedin: '',
-  instagram: '',
-  youtube: '',
-};
 
 interface ProfileData {
   firstName?: string;
@@ -37,36 +28,39 @@ interface ProfileData {
   instagram?: string;
   youtube?: string;
   videos?: string[];
+  interests?: string[];
+  industries?: string[];
+  avatar?: string;
+  introVideo?: string;
+  introText?: string;
 }
 
 const ProfilePage = () => {
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
+  const [videoLink, setVideoLink] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const { mutate: mutateGetProfile } = useMutation({
+    mutationFn: () => getProfile(),
+    onSuccess: (res) => {
+      debugger;
+      setProfileData(res?.data?.entity);
+      setVideoLink(res?.data?.videoLink);
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data);
+    },
+  });
+
   useEffect(() => {
-    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (saved) {
-      try {
-        const parsed: ProfileData = JSON.parse(saved);
-        setProfileData(parsed);
-      } catch (error) {
-        console.error('Error loading data:', error);
-      }
-    }
+    mutateGetProfile();
   }, []);
-
-  const fullName =
-    profileData?.firstName && profileData?.lastName
-      ? `${profileData.firstName} ${profileData.lastName}`
-      : 'Rob Boyce';
-
-  const tagLine = profileData?.tagLine || 'Creative Developer & Mentor';
 
   return (
     <div className="min-h-screen  py-10 px-6">
       <Row gutter={[24, 24]} className="max-w-6xl mx-auto">
         {/* Left Column */}
-        <Col xs={24} md={8}>
+        <Col xs={24} sm={24} md={8}>
           {/* Profile Summary Card */}
           <Card
             style={{
@@ -78,7 +72,7 @@ const ProfilePage = () => {
           >
             <Avatar
               size={96}
-              src="/images/avatar.svg"
+              src={profileData?.avatar || '/images/avatar.svg'}
               style={{
                 backgroundColor: '#3A57E8',
                 fontSize: 32,
@@ -90,48 +84,32 @@ const ProfilePage = () => {
             </Avatar>
 
             <Title level={3} className="mb-1">
-              {fullName}
+              {profileData ? `${profileData.firstName || ''} ${profileData.lastName || ''}` : ''}
             </Title>
             <Text type="secondary" className="block mb-4">
-              {tagLine}
+              {profileData?.tagLine || ''}
             </Text>
 
             <div className="flex justify-center gap-4 mb-6">
-              <a
-                href={profileData?.facebook || MOCK_SOCIAL_MEDIA.facebook}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href={profileData?.facebook || ''} target="_blank" rel="noopener noreferrer">
                 <Avatar
                   icon={<FacebookOutlined />}
                   className="bg-[#1877F2] hover:opacity-80 transition-opacity cursor-pointer flex items-center justify-center"
                 />
               </a>
-              <a
-                href={profileData?.linkedin || MOCK_SOCIAL_MEDIA.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href={profileData?.linkedin || ''} target="_blank" rel="noopener noreferrer">
                 <Avatar
                   icon={<LinkedinOutlined />}
                   className="bg-[#0A66C2] hover:opacity-80 transition-opacity cursor-pointer flex items-center justify-center"
                 />
               </a>
-              <a
-                href={profileData?.instagram || MOCK_SOCIAL_MEDIA.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href={profileData?.instagram || ''} target="_blank" rel="noopener noreferrer">
                 <Avatar
                   icon={<InstagramOutlined />}
                   className="bg-gradient-to-tr from-[#FD5949] to-[#D6249F] hover:opacity-80 transition-opacity cursor-pointer flex items-center justify-center"
                 />
               </a>
-              <a
-                href={profileData?.youtube || MOCK_SOCIAL_MEDIA.youtube}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href={profileData?.youtube || ''} target="_blank" rel="noopener noreferrer">
                 <Avatar
                   icon={<YoutubeOutlined />}
                   className="bg-[#FF0000] hover:opacity-80 transition-opacity cursor-pointer flex items-center justify-center"
@@ -145,7 +123,7 @@ const ProfilePage = () => {
               loading={loading}
               onClick={() => {
                 setLoading(true);
-                window.open('/auth/public-profile', '_blank');
+                window.open('/auth/I-M-Profile', '_blank');
                 setTimeout(() => setLoading(false), 1000);
               }}
               icon={<EyeOutlined />}
@@ -180,28 +158,40 @@ const ProfilePage = () => {
             <div className="mb-6">
               <div className="mb-3 font-semibold text-gray-700">Interests</div>
               <div className="flex flex-wrap gap-2">
-                {MOCK_INTERESTS.map((interest) => (
-                  <Tag color="blue" key={interest} className="px-3 py-1 rounded-md text-sm">
-                    {interest}
-                  </Tag>
-                ))}
+                {profileData &&
+                Array.isArray(profileData.interests) &&
+                profileData.interests.length > 0 ? (
+                  profileData.interests.map((interest: string) => (
+                    <Tag color="blue" key={interest} className="px-3 py-1 rounded-md text-sm">
+                      {interest}
+                    </Tag>
+                  ))
+                ) : (
+                  <Text type="secondary">No interests set</Text>
+                )}
               </div>
             </div>
             <div>
               <div className="mb-3 font-semibold text-gray-700">Industries</div>
               <div className="flex flex-wrap gap-2">
-                {MOCK_INDUSTRIES.map((industry) => (
-                  <Tag color="green" key={industry} className="px-3 py-1 rounded-md text-sm">
-                    {industry}
-                  </Tag>
-                ))}
+                {profileData &&
+                Array.isArray(profileData.industries) &&
+                profileData.industries.length > 0 ? (
+                  profileData.industries.map((industry: string) => (
+                    <Tag color="green" key={industry} className="px-3 py-1 rounded-md text-sm">
+                      {industry}
+                    </Tag>
+                  ))
+                ) : (
+                  <Text type="secondary">No industries set</Text>
+                )}
               </div>
             </div>
           </Card>
         </Col>
 
         {/* Right Column */}
-        <Col xs={24} md={16}>
+        <Col xs={24} sm={24} md={16}>
           <Row gutter={[0, 24]}>
             <Col span={24}>
               <Card
@@ -213,20 +203,24 @@ const ProfilePage = () => {
                 <Tabs defaultActiveKey="1" size="large">
                   <TabPane tab="About Me" key="1">
                     <Paragraph className="text-gray-700 text-base leading-7 whitespace-pre-wrap">
-                      {`I'm a passionate and driven developer with a strong focus on building intuitive and impactful digital experiences. With a deep understanding of modern web technologies and design principles, I take pride in crafting solutions that are both user-friendly and performance-oriented.\n\nI believe in continuous learning, clean code, and the power of collaboration. Whether it's developing a sleek frontend, solving backend challenges, or bringing ideas to life through creative design`}
+                      {profileData?.about || profileData?.introText || 'No about info set.'}
                     </Paragraph>
                   </TabPane>
 
                   <TabPane tab="Video Intro" key="2">
                     <div className="flex w-full">
                       <div className="relative w-full pb-[56.25%]">
-                        <iframe
-                          src="https://www.youtube.com/embed/2X3p_yV19Ms"
-                          className="absolute top-0 left-0 w-full h-full rounded-lg shadow-lg"
-                          style={{ border: 0 }}
-                          allowFullScreen
-                          title="YouTube video"
-                        />
+                        {videoLink ? (
+                          <iframe
+                            src={videoLink}
+                            className="absolute top-0 left-0 w-full h-full rounded-lg shadow-lg"
+                            style={{ border: 0 }}
+                            allowFullScreen
+                            title="Intro video"
+                          />
+                        ) : (
+                          <Text type="secondary">No video intro set.</Text>
+                        )}
                       </div>
                     </div>
                   </TabPane>
