@@ -16,11 +16,6 @@ const manrope = Manrope({
   display: 'swap',
 });
 
-export const metadata = {
-  title: 'Harbor',
-  description: 'Investment Platform',
-};
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
 
